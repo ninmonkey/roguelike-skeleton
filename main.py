@@ -1,12 +1,14 @@
 import os
 import random
 
-import tcod as libtcod
+# import tcod as libtcod
+import tdl
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+root_console = None
 
 
 def random_font():
@@ -17,25 +19,21 @@ def random_font():
 
 
 def init():
+    global root_console
+    #
     path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
-    # random_font()
-    libtcod.console_set_custom_font(path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-    libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'libtcod tutorial revised', False)
+    tdl.set_font(path, greyscale=True, altLayout=True)
 
-    # if real time
-    # libtcod.sys_set_fps(LIMIT_FPS)
+    root_console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title='tcod demo', fullscreen=False)
+    tdl.setFPS(LIMIT_FPS)
 
 
 def loop():
-    while not libtcod.console_is_window_closed():
-        libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_put_char(0, 1, 1, '@', libtcod.BKGND_NONE)
-        libtcod.console_flush()
+    global root_console
 
-        key = libtcod.console_check_for_keypress()
-
-        if key.vk == libtcod.KEY_ESCAPE:
-            return True
+    while not tdl.event.is_window_closed():
+        root_console.draw_char(1, 1, '@', bg=None, fg=(255,255,255))
+        tdl.flush()
 
 
 def main():
@@ -44,5 +42,6 @@ def main():
 
 
 if __name__ == '__main__':
+    # import tdl
     main()
     print('Done.')
