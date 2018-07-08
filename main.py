@@ -14,11 +14,13 @@ isDone = False
 player_x, player_y = 1, 1
 
 
-# def random_font():
-#     font_dir = os.path.join(PATH_APP_ROOT, 'fonts')
-#     fonts = os.listdir(font_dir)
-#     path = os.path.join(font_dir, random.choice(fonts))
-#     libtcod.console_set_custom_font(path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+def random_font_path():
+    font_dir = os.path.join(PATH_APP_ROOT, 'fonts')
+    fonts = os.listdir(font_dir)
+    path = os.path.join(font_dir, random.choice(fonts))
+    print("Font: {}".format(path))
+    return path
+    # libtcod.console_set_custom_font(path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 
 def init():
@@ -29,7 +31,7 @@ def init():
     player_x = SCREEN_WIDTH // 2
     player_y = SCREEN_HEIGHT // 2
 
-    # render
+    # path = random_font_path()
     path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
     tdl.set_font(path, greyscale=True, altLayout=True)
     root_console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title='tcod demo', fullscreen=False)
@@ -41,14 +43,17 @@ def loop():
     global root_console, con
     global player_x, player_y
     global isDone
+    # con=backbuffer, root_console=screen
 
     while not isDone and not tdl.event.is_window_closed():
         # draw
         con.draw_char(player_x, player_y, '@', bg=None, fg=(255, 255, 255))
         root_console.blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
+
+        # swap buffers
         tdl.flush()
 
-        # clear buffer?
+        # clear render
         con.draw_char(player_x, player_y, ' ', bg=None)
 
         # input
