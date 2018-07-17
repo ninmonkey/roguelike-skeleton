@@ -1,6 +1,6 @@
-# todo
+# about
 
-- refactor loop(), init(), to a game class. removes globals.
+code mostly based on http://rogueliketutorials.com/libtcod/
 
 # real-time vs turn-based
 

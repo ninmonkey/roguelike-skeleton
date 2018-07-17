@@ -4,14 +4,24 @@ import random
 # import tcod as libtcod
 import tdl
 
+from app import colors
+
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-# root_console = None
-# con = None  # back buffer
-# isDone = False
-# player_x, player_y = 1, 1
+
+
+class Entity:
+    def __init__(self, x, y, char, color):
+        self.x = x
+        self.y = y
+        self.char = char
+        self.color = color
+
+    def move(self,  dx, dy):
+        self.x += dx
+        self.y += dy
 
 
 class Game:
@@ -24,17 +34,36 @@ class Game:
         self.con = tdl.Console(SCREEN_WIDTH, SCREEN_HEIGHT)
         tdl.setFPS(LIMIT_FPS)
 
-        self.isDone = False
-        self.player_x = SCREEN_WIDTH // 2
-        self.player_y = SCREEN_HEIGHT // 2
-
     def init(self):
+        # reset for next round
         self.isDone = False
-        self.player_x = SCREEN_WIDTH // 2
-        self.player_y = SCREEN_HEIGHT // 2
+
+        monster = Entity(38, 24, '@', colors.yellow)
+        self.entities = [monster]
+
+        player_x = SCREEN_WIDTH // 2
+        player_y = SCREEN_HEIGHT // 2
+        self.player = Entity(player_x, player_y, '@', colors.white)
 
     def draw(self):
-        pass
+        # draw
+
+        for entity in self.entities:
+            self.con.draw_char(entity.x, entity.y, entity.char, bg=None, fg=entity.color)
+
+        self.con.draw_char(self.player.x, self.player.y, self.player.char, bg=None, fg=self.player.color)
+
+        # swap buffers
+        self.root_console.blit(self.con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
+        tdl.flush()
+
+        # clear render: full clear vs dirty blits
+        self.con.clear(fg=colors.black, bg=colors.black)
+        # else:
+        #     self.con.draw_char(self.player.x, self.player.y, ' ', bg=None)
+        #     for entity in self.entities:
+        #         self.con.draw_char(entity.x, entity.y, ' ', bg=None, fg=entity.color)
+
 
     def input(self):
         pass
@@ -44,15 +73,7 @@ class Game:
 
     def loop(self):
         while not self.isDone and not tdl.event.is_window_closed():
-            # draw
-            self.con.draw_char(self.player_x, self.player_y, '@', bg=None, fg=(255, 255, 255))
-            self.root_console.blit(self.con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
-
-            # swap buffers
-            tdl.flush()
-
-            # clear render
-            self.con.draw_char(self.player_x, self.player_y, ' ', bg=None)
+            self.draw()
 
             # input
             for event in tdl.event.get():
@@ -71,9 +92,7 @@ class Game:
             fullscreen = action.get('fullscreen')
 
             if move:
-                dx, dy = move
-                self.player_x += dx
-                self.player_y += dy
+                self.player.move(move[0], move[1])
 
             if exit:
                 self.isDone = True
