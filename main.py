@@ -65,7 +65,7 @@ class Game:
             if not user_input:
                 continue
 
-            action = handle_input(user_input)
+            action = self.handle_input(user_input)
             move = action.get('move')
             exit = action.get('exit')
             fullscreen = action.get('fullscreen')
@@ -106,14 +106,6 @@ def random_font_path():
     path = os.path.join(font_dir, random.choice(fonts))
     print("Font: {}".format(path))
     return path
-    # libtcod.console_set_custom_font(path, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-
-
-def loop():
-    global root_console, con
-    global player_x, player_y
-    global isDone
-    # con=backbuffer, root_console=screen
 
 
 def main():
