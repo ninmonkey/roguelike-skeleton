@@ -38,12 +38,12 @@ class Game:
         # reset for next round
         self.isDone = False
 
-        monster = Entity(38, 24, '@', colors.yellow)
-        self.entities = [monster]
-
         player_x = SCREEN_WIDTH // 2
         player_y = SCREEN_HEIGHT // 2
         self.player = Entity(player_x, player_y, '@', colors.white)
+
+        monster = Entity(self.player.x - 2, self.player.y, '@', colors.yellow)
+        self.entities = [monster, self.player]
 
     def draw(self):
         # draw
@@ -51,7 +51,7 @@ class Game:
         for entity in self.entities:
             self.con.draw_char(entity.x, entity.y, entity.char, bg=None, fg=entity.color)
 
-        self.con.draw_char(self.player.x, self.player.y, self.player.char, bg=None, fg=self.player.color)
+        # self.con.draw_char(self.player.x, self.player.y, self.player.char, bg=None, fg=self.player.color)
 
         # swap buffers
         self.root_console.blit(self.con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
