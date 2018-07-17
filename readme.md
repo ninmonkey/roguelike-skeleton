@@ -2,6 +2,26 @@
 
 - refactor loop(), init(), to a game class. removes globals.
 
+# real-time vs turn-based
+
+
+## async / real-time
+
+    key = tcod.console_check_for_keypress()
+        is async
+       
+    for event in tdl.event.get():
+        if event.type == 'KEYDOWN':
+            user_input = event
+            break
+    else:
+        user_input = None
+               
+## blocking / sync / turn-based
+       
+    key = tcod.console_wait_for_keypress(True)
+        is blocking                   
+    
 # tdl / libtcod docs and references
 
 fonts:
