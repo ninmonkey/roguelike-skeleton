@@ -5,9 +5,12 @@ import random
 import tdl
 
 from app import colors
+from app.render import (
+    render_blit,
+    render_clear_all,
+    render_entities,
+)
 
-SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -25,44 +28,43 @@ class Entity:
 
 
 class Game:
+    """
+    members:
+        root_console: main screen surface
+        con: 2nd surface, back-buffer to render to root_console
+    """
     def __init__(self):
         self.init()
         # path = random_font_path()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
         tdl.set_font(path, greyscale=True, altLayout=True)
-        self.root_console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title='tcod demo', fullscreen=False)
-        self.con = tdl.Console(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.root_console = tdl.init(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, title='tcod demo', fullscreen=False)
+        self.con = tdl.Console(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         tdl.setFPS(LIMIT_FPS)
 
     def init(self):
         # reset for next round
         self.isDone = False
+        self.SCREEN_WIDTH = 80
+        self.SCREEN_HEIGHT = 50
 
-        player_x = SCREEN_WIDTH // 2
-        player_y = SCREEN_HEIGHT // 2
+        player_x = self.SCREEN_WIDTH // 2
+        player_y = self.SCREEN_HEIGHT // 2
         self.player = Entity(player_x, player_y, '@', colors.white)
 
         monster = Entity(self.player.x - 2, self.player.y, '@', colors.yellow)
         self.entities = [monster, self.player]
 
     def draw(self):
-        # draw
-
-        for entity in self.entities:
-            self.con.draw_char(entity.x, entity.y, entity.char, bg=None, fg=entity.color)
-
-        # self.con.draw_char(self.player.x, self.player.y, self.player.char, bg=None, fg=self.player.color)
+        render_entities(self.con, self.entities)
+        # render_entity(self.con, self.player)
 
         # swap buffers
-        self.root_console.blit(self.con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
-        tdl.flush()
+        render_blit(self.root_console, self.con, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
 
-        # clear render: full clear vs dirty blits
-        self.con.clear(fg=colors.black, bg=colors.black)
-        # else:
-        #     self.con.draw_char(self.player.x, self.player.y, ' ', bg=None)
-        #     for entity in self.entities:
-        #         self.con.draw_char(entity.x, entity.y, ' ', bg=None, fg=entity.color)
+        # lazy, full clear.
+        tdl.flush()
+        render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
 
     def input(self):
