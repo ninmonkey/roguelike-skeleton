@@ -29,6 +29,9 @@ class Map:
         self.create_room(Rect(self.tiles_x//2, self.tiles_y//2,  2, 4))
         self.create_room(Rect(20, 28, 30, 8))
 
+        self.create_room(Rect(0, 0, 4, 2))
+        self.create_room(Rect(0, 2, 2, 2))
+
     def create_room(self, rect):
         for x in range(rect.x1 + 1, min(rect.x2, self.tiles_x)):
             for y in range(rect.y1 + 1, min(rect.y2, self.tiles_y)):
@@ -113,16 +116,19 @@ class Game:
         self.entities = [monster, self.player]
 
     def draw(self):
-        render_entities(self.con, self.entities)
-        # render_entity(self.con, self.player)
-
+        # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
                 wall = self.map.tiles[x][y].blocked_sight
                 if wall:
+                    # self.con.draw_char(x, y, '#', fg=colors.gray_10, bg=colors.dark_wall)
                     self.con.draw_char(x, y, None, fg=None, bg=colors.dark_wall)
                 else:
+                    # self.con.draw_char(x, y, '.', fg=colors.gray_60, bg=colors.dark_ground)
                     self.con.draw_char(x, y, None, fg=None, bg=colors.dark_ground)
+
+        render_entities(self.con, self.entities)
+        # render_entity(self.con, self.player)
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
