@@ -15,16 +15,45 @@ LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
+class Map:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.tiles = self.init_tiles()
+
+    def init_tiles(self):
+        tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
+
+        for y in range(20, 32):
+            for x in range(20, 60):
+                tiles[x][y].blocked = False
+                tiles[x][y].blocked_sight = False
+
+        return tiles
+
+
+class Tile:
+    # default to block both if block=True
+    def __init__(self, block, block_sight=None):
+        self.blocked = block
+        if block_sight is None:
+            block_sight = block
+
+        self.blocked_sight = block_sight
+
+
 class Entity:
-    def __init__(self, x, y, char, color):
+    def __init__(self, x, y, char, color, map):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
+        self.map = map
 
     def move(self,  dx, dy):
-        self.x += dx
-        self.y += dy
+        if not self.map.tiles[self.x + dx][self.y + dy].blocked:
+            self.x += dx
+            self.y += dy
 
 
 class Game:
@@ -38,29 +67,39 @@ class Game:
         # path = random_font_path()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
         tdl.set_font(path, greyscale=True, altLayout=True)
-        self.root_console = tdl.init(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, title='tcod demo', fullscreen=False)
-        self.con = tdl.Console(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
+        self.con = tdl.Console(self.TILES_X, self.TILES_Y)
         tdl.setFPS(LIMIT_FPS)
 
     def init(self):
         # reset for next round
         self.isDone = False
-        self.SCREEN_WIDTH = 80
-        self.SCREEN_HEIGHT = 50
+        self.TILES_X = 80
+        self.TILES_Y = 50
 
-        player_x = self.SCREEN_WIDTH // 2
-        player_y = self.SCREEN_HEIGHT // 2
-        self.player = Entity(player_x, player_y, '@', colors.white)
+        self.map = Map(self.TILES_X, self.TILES_Y)
 
-        monster = Entity(self.player.x - 2, self.player.y, '@', colors.yellow)
+        player_x = self.TILES_X // 2
+        player_y = self.TILES_Y // 2
+        self.player = Entity(player_x, player_y, '@', colors.white, self.map)
+
+        monster = Entity(self.player.x - 2, self.player.y, '@', colors.yellow, self.map)
         self.entities = [monster, self.player]
 
     def draw(self):
         render_entities(self.con, self.entities)
         # render_entity(self.con, self.player)
 
+        for y in range(self.TILES_Y):
+            for x in range(self.TILES_X):
+                wall = self.map.tiles[x][y].blocked_sight
+                if wall:
+                    self.con.draw_char(x, y, None, fg=None, bg=colors.dark_wall)
+                else:
+                    self.con.draw_char(x, y, None, fg=None, bg=colors.dark_ground)
+
         # swap buffers
-        render_blit(self.root_console, self.con, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
 
         # lazy, full clear.
         tdl.flush()
