@@ -16,13 +16,13 @@ PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 class Map:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, tiles_x, tiles_y):
+        self.tiles_x = tiles_x
+        self.tiles_y = tiles_y
         self.tiles = self.init_tiles()
 
     def init_tiles(self):
-        tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
+        tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
         for y in range(20, 32):
             for x in range(20, 60):
@@ -30,6 +30,19 @@ class Map:
                 tiles[x][y].blocked_sight = False
 
         return tiles
+
+    def is_blocked(self, x, y):
+        # default to failed bounds check
+        if x < 0 or x > self.tiles_x:
+            return True
+
+        if y < 0 or y > self.tiles_y:
+            return True
+
+        if self.tiles[x][y].blocked:
+            return True
+
+        return False
 
 
 class Tile:
@@ -51,7 +64,7 @@ class Entity:
         self.map = map
 
     def move(self,  dx, dy):
-        if not self.map.tiles[self.x + dx][self.y + dy].blocked:
+        if not self.map.is_blocked(self.x + dx, self.y + dy):
             self.x += dx
             self.y += dy
 
