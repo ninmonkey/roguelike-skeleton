@@ -19,30 +19,43 @@ class Map:
     def __init__(self, tiles_x, tiles_y):
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
-        self.tiles = self.init_tiles()
+        self.init_tiles()
 
     def init_tiles(self):
-        tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
-        for y in range(20, 32):
-            for x in range(20, 60):
-                tiles[x][y].blocked = False
-                tiles[x][y].blocked_sight = False
+        # two rooms connected by door
+        self.create_room(Rect(20, 20, 30, 8))
+        self.create_room(Rect(self.tiles_x//2, self.tiles_y//2,  2, 4))
+        self.create_room(Rect(20, 28, 30, 8))
 
-        return tiles
+    def create_room(self, rect):
+        for x in range(rect.x1 + 1, min(rect.x2, self.tiles_x)):
+            for y in range(rect.y1 + 1, min(rect.y2, self.tiles_y)):
+                print(x, y)
+                self.tiles[x][y].blocked = False
+                self.tiles[x][y].blocked_sight = False
 
     def is_blocked(self, x, y):
         # default to failed bounds check
-        if x < 0 or x > self.tiles_x:
+        if x < 0 or x >= self.tiles_x:
             return True
 
-        if y < 0 or y > self.tiles_y:
+        if y < 0 or y >= self.tiles_y:
             return True
 
         if self.tiles[x][y].blocked:
             return True
 
         return False
+
+
+class Rect:
+    def __init__(self, x, y, w, h):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
 
 
 class Tile:
@@ -86,7 +99,7 @@ class Game:
 
     def init(self):
         # reset for next round
-        self.isDone = False
+        self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
 
@@ -126,7 +139,7 @@ class Game:
         pass
 
     def loop(self):
-        while not self.isDone and not tdl.event.is_window_closed():
+        while not self.is_done and not tdl.event.is_window_closed():
             self.draw()
 
             # input
@@ -149,7 +162,7 @@ class Game:
                 self.player.move(move[0], move[1])
 
             if exit:
-                self.isDone = True
+                self.is_done = True
 
             if fullscreen:
                 tdl.set_fullscreen(not tdl.get_fullscreen())

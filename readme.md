@@ -2,6 +2,11 @@
 
 code mostly based on http://rogueliketutorials.com/libtcod/
 
+# todo:
+
+- refactor tiles[x][y] to fail when out of bounds
+
+
 # real-time vs turn-based
 
 
