@@ -25,16 +25,17 @@ class Map:
         self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
         # two rooms connected by door
-        self.create_room(Rect(20, 20, 30, 8))
-        self.create_room(Rect(self.tiles_x//2, self.tiles_y//2,  2, 4))
-        self.create_room(Rect(20, 28, 30, 8))
-
-        self.create_room(Rect(0, 0, 4, 2))
-        self.create_room(Rect(0, 2, 2, 2))
+        x = self.tiles_x//2
+        y = self.tiles_y//2
+        self.create_room(Rect(x - 4, y - 4, x + 4, y))
+        self.create_room(Rect(x, y, x + 1, y + 2))
+        self.create_room(Rect(x - 4, y+1, x + 4, y+4))
 
     def create_room(self, rect):
-        for x in range(rect.x1 + 1, min(rect.x2, self.tiles_x)):
-            for y in range(rect.y1 + 1, min(rect.y2, self.tiles_y)):
+        end_x = min(rect.x2, self.tiles_x)
+        end_y = min(rect.y2, self.tiles_y)
+        for x in range(rect.x1, end_x):
+            for y in range(rect.y1, end_y):
                 print(x, y)
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].blocked_sight = False
@@ -54,11 +55,11 @@ class Map:
 
 
 class Rect:
-    def __init__(self, x, y, w, h):
-        self.x1 = x
-        self.y1 = y
-        self.x2 = x + w
-        self.y2 = y + h
+    def __init__(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
 
 
 class Tile:
