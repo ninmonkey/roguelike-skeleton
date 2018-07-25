@@ -1,8 +1,7 @@
 import os
 import random
 
-# import tcod as libtcod
-import tdl
+import tdl # import tcod as libtcod
 
 from app import colors
 from app.render import (
@@ -27,16 +26,15 @@ class Map:
         # two rooms connected by door
         x = self.tiles_x//2
         y = self.tiles_y//2
-        self.create_room(Rect(x - 4, y - 4, x + 4, y))
-        self.create_room(Rect(x, y, x + 1, y + 2))
-        self.create_room(Rect(x - 4, y+1, x + 4, y+4))
+        self.create_room(Rect(x-4, y-4, x+4, y))
+        self.create_room(Rect(x, y, x+1, y+2))
+        self.create_room(Rect(x-4, y+1, x+4, y+4))
 
     def create_room(self, rect):
         end_x = min(rect.x2, self.tiles_x)
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
-                print(x, y)
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].blocked_sight = False
 
@@ -113,7 +111,7 @@ class Game:
         player_y = self.TILES_Y // 2
         self.player = Entity(player_x, player_y, '@', colors.white, self.map)
 
-        monster = Entity(self.player.x - 2, self.player.y, '@', colors.yellow, self.map)
+        monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self.map)
         self.entities = [monster, self.player]
 
     def draw(self):
@@ -207,6 +205,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # import tdl
     main()
     print('Done.')
