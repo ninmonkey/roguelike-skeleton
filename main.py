@@ -43,6 +43,15 @@ class Map:
         self.create_room(Rect(5+2, 10, 5+1+2, 10+10))
         self.create_room(Rect(5, 10, 5+1+1, 10+1))
 
+    def at(self, x, y):
+        if any([x < 0,
+                x > self.tiles_x,
+                y < 0,
+                y > self.tiles_y]):
+            raise ValueError("Tile outside Map bounds: ({}, {})".format(x, y))
+
+        return self.tiles[x][y]
+
     def create_room(self, rect):
         # [x1, x2), [y1, y2)
         if any([rect.x1 > rect.x2,
@@ -54,8 +63,8 @@ class Map:
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
-                self.tiles[x][y].blocked = False
-                self.tiles[x][y].blocked_sight = False
+                self.at(x, y).blocked = False
+                self.at(x, y).blocked_sight = False
 
     def is_blocked(self, x, y):
         # default to failed bounds check
@@ -65,7 +74,7 @@ class Map:
         if y < 0 or y >= self.tiles_y:
             return True
 
-        if self.tiles[x][y].blocked:
+        if self.at(x,y).blocked:
             return True
 
         return False
@@ -140,7 +149,7 @@ class Game:
         # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
-                wall = self.map.tiles[x][y].blocked_sight
+                wall = self.map.at(x,y).blocked_sight
                 if wall:
                     # self.con.draw_char(x, y, '#', fg=colors.gray_10, bg=colors.dark_wall)
                     self.con.draw_char(x, y, None, fg=None, bg=colors.dark_wall)
