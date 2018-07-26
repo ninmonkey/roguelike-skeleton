@@ -63,6 +63,11 @@ class Map:
         x += 4
         self.create_room(Rect(x, y, 3, 3))
 
+        self.create_tunnel_horizontal(10, 30, 30)
+        self.create_tunnel_vertical(10, 30, 10)
+        self.create_tunnel_horizontal(10, 30, 10)
+        self.create_tunnel_vertical(10, 30, 30)
+
     def at(self, x, y):
         if any([x < 0,
                 x > self.tiles_x,
@@ -86,10 +91,15 @@ class Map:
                 self.at(x, y).blocked = False
                 self.at(x, y).blocked_sight = False
 
-    def create_tunnel(self, x1, x2, y):
+    def create_tunnel_horizontal(self, x1, x2, y):
         # naive horizontal line.
-        # todo: replace with (x1,y1)->(x2,y2) or (x1, y1, angle, length)
+        # todo: replace with single (x1,y1)->(x2,y2) or (x1, y1, angle, length)
         for x in range(min(x1, x2), max(x1, x2) + 1):
+            self.at(x, y).blocked = False
+            self.at(x, y).blocked_sight = False
+
+    def create_tunnel_vertical(self, y1, y2, x):
+        for y in range(min(y1, y2), max(y1, y2) + 1):
             self.at(x, y).blocked = False
             self.at(x, y).blocked_sight = False
 
