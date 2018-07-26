@@ -87,8 +87,18 @@ class Rect:
         self.x2 = x2
         self.y2 = y2
 
+    def get_center(self):
+        center_x = (self.x1 + self.x2) // 2
+        center_y = (self.y1 + self.y2) // 2
+        return (center_x, center_y)
+
+    def intersect(self, other):
+        return (self.x1 <= other.x2 and self.x2 >= other.x1 and
+                self.y1 <= other.y2 and self.y2 >= other.y1)
+
     def __str__(self):
         return "Rect(x1={}, y1={}, x2={}, y2={})".format(self.x1, self.y1, self.x2, self.y2)
+
 
 class Tile:
     # default to block both if block=True
@@ -166,7 +176,6 @@ class Game:
         # lazy, full clear.
         tdl.flush()
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
-
 
     def input(self):
         pass

@@ -1,4 +1,4 @@
-# rewrite as dict?
+# rewrite as dict? Or at least refactor to be internally-consistent
 
 gray_10 = (25, 25, 25)
 gray_20 = (51, 51, 51)
