@@ -39,6 +39,10 @@ class Map:
         x += 3
         self.create_room(Rect(x, y, x+2, y+2))
 
+        self.create_room(Rect(5, 10, 5+1, 10+10))
+        self.create_room(Rect(5+2, 10, 5+1+2, 10+10))
+        self.create_room(Rect(5, 10, 5+1+1, 10+1))
+
 
     def create_room(self, rect):
         # [x1, x2), [y1, y2)
