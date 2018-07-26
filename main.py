@@ -30,7 +30,18 @@ class Map:
         self.create_room(Rect(x, y, x+1, y+2))
         self.create_room(Rect(x-4, y+1, x+4, y+4))
 
+        # topelft
+        x = 1
+        y = 1
+        self.create_room(Rect(x, y, x+2, y+2))
+        self.create_room(Rect(x+1, y, x+3, y+1))
+
+        x += 3
+        self.create_room(Rect(x, y, x+2, y+2))
+
+
     def create_room(self, rect):
+        # [x1, x2), [y1, y2)
         end_x = min(rect.x2, self.tiles_x)
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
@@ -109,6 +120,7 @@ class Game:
 
         player_x = self.TILES_X // 2
         player_y = self.TILES_Y // 2
+        (player_x, player_y) = (2, 2)
         self.player = Entity(player_x, player_y, '@', colors.white, self.map)
 
         monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self.map)
