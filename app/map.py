@@ -1,3 +1,9 @@
+ROOM_MAX_SIZE = 10
+ROOM_MIN_SIZE = 6
+ROOMS_MAX = 30
+ROOMS_MAX_FAILURES = 20
+
+
 class Rect:
     def __init__(self, x, y, w, h):
         self.x1 = x
@@ -37,6 +43,14 @@ class Map:
         self.init_tiles()
 
     def init_tiles(self):
+        self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        self.gen_static_map()
+        self.gen_random_map()
+
+    def gen_random_map(self):
+        self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+
+    def gen_static_map(self):
         self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
         # rooms connected by doors
@@ -115,3 +129,6 @@ class Map:
             return True
 
         return False
+
+    def __str__(self):
+        return "Map({}, {})".format(self.tiles_x, self.tiles_y)

@@ -52,6 +52,7 @@ class Game:
         self.TILES_Y = 50
 
         self.map = Map(self.TILES_X, self.TILES_Y)
+        print(self.map)
 
         player_x = self.TILES_X // 2
         player_y = self.TILES_Y // 2

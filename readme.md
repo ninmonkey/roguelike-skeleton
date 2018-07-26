@@ -4,7 +4,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- refactor tiles[x][y] to fail when out of bounds
+- separate screen_tiles_x from map_tiles_x for scrolling
 
 
 # real-time vs turn-based
