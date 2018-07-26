@@ -23,25 +23,40 @@ class Map:
     def init_tiles(self):
         self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
-        # two rooms connected by door
+        # rooms connected by doors
         x = self.tiles_x//2
         y = self.tiles_y//2
-        self.create_room(Rect(x-4, y-4, x+4, y))
-        self.create_room(Rect(x, y, x+1, y+2))
-        self.create_room(Rect(x-4, y+1, x+4, y+4))
 
-        # topelft
+        self.create_room(Rect(0, 0, 1, 2))
+
         x = 1
         y = 1
-        self.create_room(Rect(x, y, x+2, y+2))
-        self.create_room(Rect(x+1, y, x+3, y+1))
+        self.create_room(Rect(x, y, 3, 3))
+        self.create_room(Rect(x+3, y, 1, 1))
 
-        x += 3
-        self.create_room(Rect(x, y, x+2, y+2))
+        x += 4
+        self.create_room(Rect(x, y, 3, 3))
 
-        self.create_room(Rect(5, 10, 5+1, 10+10))
-        self.create_room(Rect(5+2, 10, 5+1+2, 10+10))
-        self.create_room(Rect(5, 10, 5+1+1, 10+1))
+        x -= 4
+        y += 4
+        print(x, y)
+        self.create_room(Rect(3, 4, 1, 1))
+        self.create_room(Rect(7, 4, 1, 1))
+        self.create_room(Rect(1, 5, 3, 3))
+
+        x += 4
+        self.create_room(Rect(x, y, 3, 3))
+
+
+
+        # self.create_room(Rect(x+1, y, x+3, y+1))
+        #
+        # x += 3
+        # self.create_room(Rect(x, y, x+2, y+2))
+        #
+        # self.create_room(Rect(5, 10, 5+1, 10+10))
+        # self.create_room(Rect(5+2, 10, 5+1+2, 10+10))
+        # self.create_room(Rect(5, 10, 5+1+1, 10+1))
 
     def at(self, x, y):
         if any([x < 0,
@@ -81,11 +96,11 @@ class Map:
 
 
 class Rect:
-    def __init__(self, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    def __init__(self, x, y, w, h):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
 
     def get_center(self):
         center_x = (self.x1 + self.x2) // 2
@@ -205,6 +220,7 @@ class Game:
 
             if move:
                 self.player.move(move[0], move[1])
+                print("Player: ({}, {})".format(self.player.x, self.player.y))
 
             if exit:
                 self.is_done = True
