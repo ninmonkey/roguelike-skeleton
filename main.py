@@ -43,9 +43,13 @@ class Map:
         self.create_room(Rect(5+2, 10, 5+1+2, 10+10))
         self.create_room(Rect(5, 10, 5+1+1, 10+1))
 
-
     def create_room(self, rect):
         # [x1, x2), [y1, y2)
+        if any([rect.x1 > rect.x2,
+                rect.y1 > rect.y2]):
+            print("Bad create_room args: {}".format(rect))
+            return
+
         end_x = min(rect.x2, self.tiles_x)
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
@@ -74,6 +78,8 @@ class Rect:
         self.x2 = x2
         self.y2 = y2
 
+    def __str__(self):
+        return "Rect(x1={}, y1={}, x2={}, y2={})".format(self.x1, self.y1, self.x2, self.y2)
 
 class Tile:
     # default to block both if block=True
