@@ -20,6 +20,8 @@ class Rect:
 
 class Tile:
     # default to block both if block=True
+    # todo: Maybe they meant (block_sight==None to mean is_visible==True) ?
+    # one place uses `block_sight` the other "blocked_sight" so it's ambiguous
     def __init__(self, block, block_sight=None):
         self.blocked = block
         if block_sight is None:
@@ -83,6 +85,13 @@ class Map:
             for y in range(rect.y1, end_y):
                 self.at(x, y).blocked = False
                 self.at(x, y).blocked_sight = False
+
+    def create_tunnel(self, x1, x2, y):
+        # naive horizontal line.
+        # todo: replace with (x1,y1)->(x2,y2) or (x1, y1, angle, length)
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            self.at(x, y).blocked = False
+            self.at(x, y).blocked_sight = False
 
     def is_blocked(self, x, y):
         # default to failed bounds check
