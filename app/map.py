@@ -26,14 +26,12 @@ class Rect:
 
 class Tile:
     # default to block both if block=True
-    # todo: Maybe they meant (block_sight==None to mean is_visible==True) ?
-    # one place uses `block_sight` the other "blocked_sight" so it's ambiguous
-    def __init__(self, block, block_sight=None):
+    def __init__(self, block, visible=None):
         self.blocked = block
-        if block_sight is None:
-            block_sight = block
+        if visible is None:
+            visible = block
 
-        self.blocked_sight = block_sight
+        self.visible = visible
 
 
 class Map:
@@ -44,7 +42,7 @@ class Map:
 
     def init_tiles(self):
         self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-        self.gen_static_map()
+        # self.gen_static_map()
         self.gen_random_map()
 
     def gen_random_map(self):
@@ -103,19 +101,19 @@ class Map:
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
                 self.at(x, y).blocked = False
-                self.at(x, y).blocked_sight = False
+                self.at(x, y).visible = False
 
     def create_tunnel_horizontal(self, x1, x2, y):
         # naive horizontal line.
         # todo: replace with single (x1,y1)->(x2,y2) or (x1, y1, angle, length)
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.at(x, y).blocked = False
-            self.at(x, y).blocked_sight = False
+            self.at(x, y).visible = False
 
     def create_tunnel_vertical(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.at(x, y).blocked = False
-            self.at(x, y).blocked_sight = False
+            self.at(x, y).visible = False
 
     def is_blocked(self, x, y):
         # default to failed bounds check

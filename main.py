@@ -14,7 +14,7 @@ from app.map import Map
 
 LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-
+REALTIME = False # turn-based or real-time movement?
 
 class Entity:
     def __init__(self, x, y, char, color, map):
@@ -66,7 +66,7 @@ class Game:
         # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
-                wall = self.map.at(x,y).blocked_sight
+                wall = self.map.at(x,y).visible
                 if wall:
                     # self.con.draw_char(x, y, '#', fg=colors.gray_10, bg=colors.dark_wall)
                     self.con.draw_char(x, y, None, fg=None, bg=colors.dark_wall)
