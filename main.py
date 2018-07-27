@@ -23,13 +23,17 @@ class Entity:
         self.char = char
         self.color = color
         self.game = game
-        # self.map = game.map
+        self.map = game.map
 
-    def move(self,  dx, dy):
-        if not self.game.map.is_blocked(self.x + dx, self.y + dy):
+    def move(self, dx, dy):
+        if not self.map.is_blocked(self.x + dx, self.y + dy):
             self.x += dx
             self.y += dy
 
+    def teleport_to(self, x, y):
+        if self.map.in_bounds(x, y):
+            self.x = x
+            self.y = y
 
 class Game:
     """
@@ -38,6 +42,7 @@ class Game:
         con: 2nd surface, back-buffer to render to root_console
     """
     def __init__(self):
+        self.player = None
         self.init()
         # path = random_font_path()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
@@ -56,12 +61,14 @@ class Game:
         # player_x = self.TILES_X // 2
         # player_y = self.TILES_Y // 2
         (player_x, player_y) = (2, 2)
-        self.player = Entity(player_x, player_y, '@', colors.white, self)
-        self.map.reset(self.TILES_X, self.TILES_Y)
-        print(self.map)
+        self.player = Entity(0, 0, '@', colors.white, self)
+        # self.player = Entity(player_x, player_y, '@', colors.white, self)
+        # self.map.reset(self.TILES_X, self.TILES_Y)
 
         monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self)
         self.entities = [monster, self.player]
+
+        self.map.gen_static_map()
 
     # def add_entity(self, entity):
     #     self.entities.append(entity)
