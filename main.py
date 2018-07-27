@@ -14,18 +14,19 @@ from app.map import Map
 
 LIMIT_FPS = 20
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-REALTIME = False # turn-based or real-time movement?
+
 
 class Entity:
-    def __init__(self, x, y, char, color, map):
+    def __init__(self, x, y, char, color, game):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
-        self.map = map
+        self.game = game
+        # self.map = game.map
 
     def move(self,  dx, dy):
-        if not self.map.is_blocked(self.x + dx, self.y + dy):
+        if not self.game.map.is_blocked(self.x + dx, self.y + dy):
             self.x += dx
             self.y += dy
 
@@ -50,17 +51,20 @@ class Game:
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
+        self.map = Map(self.TILES_X, self.TILES_Y, self)
 
-        self.map = Map(self.TILES_X, self.TILES_Y)
+        # player_x = self.TILES_X // 2
+        # player_y = self.TILES_Y // 2
+        (player_x, player_y) = (2, 2)
+        self.player = Entity(player_x, player_y, '@', colors.white, self)
+        self.map.reset(self.TILES_X, self.TILES_Y)
         print(self.map)
 
-        player_x = self.TILES_X // 2
-        player_y = self.TILES_Y // 2
-        (player_x, player_y) = (2, 2)
-        self.player = Entity(player_x, player_y, '@', colors.white, self.map)
-
-        monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self.map)
+        monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self)
         self.entities = [monster, self.player]
+
+    # def add_entity(self, entity):
+    #     self.entities.append(entity)
 
     def draw(self):
         # map
