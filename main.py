@@ -42,7 +42,6 @@ class Game:
         con: 2nd surface, back-buffer to render to root_console
     """
     def __init__(self):
-        self.player = None
         self.init()
         # path = random_font_path()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
@@ -56,19 +55,37 @@ class Game:
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
+        self.entities = []
+        self.player = None
         self.map = Map(self.TILES_X, self.TILES_Y, self)
+        self.player = self.spawn("player")
+
 
         # player_x = self.TILES_X // 2
         # player_y = self.TILES_Y // 2
-        (player_x, player_y) = (2, 2)
-        self.player = Entity(0, 0, '@', colors.white, self)
+        # (player_x, player_y) = (2, 2)
+        # self.player = Entity(0, 0, '@', colors.white, self)
         # self.player = Entity(player_x, player_y, '@', colors.white, self)
         # self.map.reset(self.TILES_X, self.TILES_Y)
 
-        monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self)
-        self.entities = [monster, self.player]
+        # monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self)
+        # self.entities = [monster, self.player]
 
-        self.map.gen_static_map()
+        self.map.gen_random_map()
+
+    def spawn(self, name, **kwargs):
+        if name == 'player':
+            x = kwargs.get('x', 0)
+            y = kwargs.get('y', 0)
+            spawn = Entity(x, y, '@', colors.white, self)
+            if self.player and self.player in self.entities:
+                self.entities.remove(self.player)
+
+            self.entities.append(spawn)
+            self.player = spawn
+            return spawn
+        else:
+            raise ValueError("Unknown spawn type: {}".format(name))
 
     # def add_entity(self, entity):
     #     self.entities.append(entity)

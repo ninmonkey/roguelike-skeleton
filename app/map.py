@@ -62,13 +62,13 @@ class Map:
         self.create_room(r2)
         self.create_tunnel_horizontal(25, 55, 23)
 
+        self.game.spawn('player', **{
+            'x': r1.get_center()[0],
+            'y': r1.get_center()[1]})
+        self.game.player.teleport_to(*r1.get_center())
+
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
-        print(self)
-
-        # rooms connected by doors
-        x = self.tiles_x//2
-        y = self.tiles_y//2
 
         self.create_room(Rect(0, 0, 1, 2))
 
@@ -96,7 +96,10 @@ class Map:
 
         r = Rect(18, 18, 5, 5)
         self.create_room(r)
-        self.game.player.teleport_to(*r.get_center())
+        # self.game.player.teleport_to(*r.get_center())
+        self.game.spawn("player", {
+            'x': r.get_center()[0],
+            'y': r.get_center()[1], })
 
     def in_bounds(self, x, y):
         # is tile on map
