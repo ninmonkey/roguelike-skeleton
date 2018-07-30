@@ -35,11 +35,14 @@ class Entity:
             self.x = x
             self.y = y
 
+
 class Game:
     """
+        see `init()`, definitions are not duplicated between it and `__init__()`
     members:
         root_console: main screen surface
         con: 2nd surface, back-buffer to render to root_console
+
     """
     def __init__(self):
         self.init()
@@ -84,6 +87,11 @@ class Game:
             self.entities.append(spawn)
             self.player = spawn
             return spawn
+        elif name == 'monster':
+            x = kwargs.get('x', 0)
+            y = kwargs.get('y', 0)
+            spawn = Entity(x, y, 'X', colors.yellow, self)
+            self.entities.append(spawn)
         else:
             raise ValueError("Unknown spawn type: {}".format(name))
 

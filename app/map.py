@@ -65,7 +65,11 @@ class Map:
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
             'y': r1.get_center()[1]})
-        self.game.player.teleport_to(*r1.get_center())
+        # self.game.player.teleport_to(*r1.get_center())
+
+        self.game.spawn('monster', **{
+            'x': r2.get_center()[0],
+            'y': r2.get_center()[1]})
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
