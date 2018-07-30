@@ -130,6 +130,7 @@ class Game:
         while not self.is_done and not tdl.event.is_window_closed():
             self.draw()
 
+            # todo: (verify) but I think this consumes only one event per loop
             # input
             for event in tdl.event.get():
                 if event.type == 'KEYDOWN':
@@ -142,18 +143,14 @@ class Game:
                 continue
 
             action = self.handle_input(user_input)
-            move = action.get('move')
-            exit = action.get('exit')
-            fullscreen = action.get('fullscreen')
 
-            if move:
-                self.player.move(move[0], move[1])
-                print("Player: ({}, {})".format(self.player.x, self.player.y))
+            if action.get('move'):
+                self.player.move(*action.get('move'))
 
-            if exit:
+            if action.get('exit'):
                 self.is_done = True
 
-            if fullscreen:
+            if action.get('fullscreen'):
                 tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def handle_input(self, user_input):
