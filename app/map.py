@@ -3,6 +3,8 @@ ROOM_MIN_SIZE = 6
 ROOMS_MAX = 30
 ROOMS_MAX_FAILURES = 20
 
+from app import colors
+
 
 class Rect:
     def __init__(self, x, y, w, h):
@@ -26,12 +28,23 @@ class Rect:
 
 class Tile:
     # default to block both if block=True
-    def __init__(self, block, visible=None):
-        self.blocked = block
-        if visible is None:
-            visible = block
+    def __init__(self, tile, blocking=False, visible=None):
 
-        self.visible = visible
+        self.blocking = blocking
+        self.visible = True
+        self.color = colors.white
+        self.set_type(tile)
+
+    def set_type(self, tile):
+        if tile == 'floor':
+            self.blocking = False
+            self.color = colors.dark_floor
+        elif tile == 'wall':
+            self.blocking = True
+            self.color = colors.dark_wall
+        else:
+            raise ValueError("Unknown tile type: {}".format(tile))
+
 
 
 class Map:
@@ -39,20 +52,13 @@ class Map:
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
         self.reset(self.tiles_x, self.tiles_y)
-        # self.init_tiles()
-        # self.tiles = [[]]
+        self.tiles = [[]]
         self.game = game
 
     def reset(self, tiles_x, tiles_y):
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
-        self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-
-    # def init_tiles(self):
-    #     self.reset(self.tiles_x, self.tiles_y)
-        # self.tiles = [[Tile(True) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-        # self.gen_static_map()
-        # self.gen_random_map()
+        self.tiles = [[Tile('wall') for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
     def gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -65,7 +71,6 @@ class Map:
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
             'y': r1.get_center()[1]})
-        # self.game.player.teleport_to(*r1.get_center())
 
         self.game.spawn('monster', **{
             'x': r2.get_center()[0],
@@ -100,7 +105,7 @@ class Map:
 
         r = Rect(18, 18, 5, 5)
         self.create_room(r)
-        # self.game.player.teleport_to(*r.get_center())
+
         self.game.spawn("player", {
             'x': r.get_center()[0],
             'y': r.get_center()[1], })
@@ -132,21 +137,18 @@ class Map:
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
-                self.at(x, y).blocked = False
-                self.at(x, y).visible = False
+                self.at(x, y).set_type('floor')
 
     def create_tunnel_horizontal(self, x1, x2, y):
         # naive horizontal line.
         # todo: replace with single (x1,y1)->(x2,y2) or (x1, y1, angle, length)
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.at(x, y).blocked = False
-            self.at(x, y).visible = False
+            self.at(x, y).set_type('floor')
 
     def create_tunnel_vertical(self, y1, y2, x):
         # todo: replace this and create_tunnel_horizontal()
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.at(x, y).blocked = False
-            self.at(x, y).visible = False
+            self.at(x, y).set_type('floor')
 
     def is_blocked(self, x, y):
         # default to failed bounds check
@@ -156,7 +158,7 @@ class Map:
         if y < 0 or y >= self.tiles_y:
             return True
 
-        if self.at(x,y).blocked:
+        if self.at(x,y).blocking:
             return True
 
         return False

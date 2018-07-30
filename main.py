@@ -54,7 +54,7 @@ class Game:
         tdl.setFPS(LIMIT_FPS)
 
     def init(self):
-        # reset for next round
+        # reset for next round, and first-time init.
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
@@ -62,17 +62,6 @@ class Game:
         self.player = None
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.player = self.spawn("player")
-
-
-        # player_x = self.TILES_X // 2
-        # player_y = self.TILES_Y // 2
-        # (player_x, player_y) = (2, 2)
-        # self.player = Entity(0, 0, '@', colors.white, self)
-        # self.player = Entity(player_x, player_y, '@', colors.white, self)
-        # self.map.reset(self.TILES_X, self.TILES_Y)
-
-        # monster = Entity(self.player.x - 2, self.player.y-1, '@', colors.yellow, self)
-        # self.entities = [monster, self.player]
 
         self.map.gen_random_map()
 
@@ -102,16 +91,10 @@ class Game:
         # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
-                wall = self.map.at(x,y).visible
-                if wall:
-                    # self.con.draw_char(x, y, '#', fg=colors.gray_10, bg=colors.dark_wall)
-                    self.con.draw_char(x, y, None, fg=None, bg=colors.dark_wall)
-                else:
-                    # self.con.draw_char(x, y, '.', fg=colors.gray_60, bg=colors.dark_ground)
-                    self.con.draw_char(x, y, None, fg=None, bg=colors.dark_ground)
+                color = self.map.at(x, y).color
+                self.con.draw_char(x, y, None, fg=None, bg=color)
 
         render_entities(self.con, self.entities)
-        # render_entity(self.con, self.player)
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)

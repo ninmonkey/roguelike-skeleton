@@ -7,6 +7,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 - spawn factory which map can access (eg: Game.spawn(..))
 - separate screen_tiles_x from map_tiles_x for scrolling
 - text: player loc, monster count, fps.
+- tiles enum?
 
 # real-time vs turn-based
 
