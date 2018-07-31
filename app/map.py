@@ -28,6 +28,14 @@ class Rect:
         center_y = (self.y1 + self.y2) // 2
         return (center_x, center_y)
 
+    def in_rect(self, other):
+        return (
+            self.x1 >= other.x1 and self.x1 <= other.x2 and
+            self.x2 >= other.x1 and self.x2 <= other.x2 and
+            self.y1 >= other.y1 and self.y1 <= other.y2 and
+            self.y2 >= other.y1 and self.y2 <= other.y2
+        )
+
     def intersect(self, other):
         # off-by-one error, see Map() create_room
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
@@ -78,6 +86,45 @@ class Map:
         self.tiles = [[Tile(tile_id) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
     def gen_random_map(self):
+        self.reset(self.tiles_x, self.tiles_y, tile_id=TileId.WALL)
+
+        r1 = Rect(
+            x=randint(0, self.tiles_x),
+            y=randint(0, self.tiles_y),
+            w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
+            h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
+        )
+        rect_screen = Rect(0, 0, self.tiles_x, self.tiles_y)
+        rooms = []
+        # print(rect_screen)
+        # print(r1)
+        # if not r1.intersect(rect_screen):
+        #     print("Warning: room outside map!")
+
+        for room_id in range(1):
+            room = Rect(
+                x=randint(0, self.tiles_x),
+                y=randint(0, self.tiles_y),
+                w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
+                h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
+            )
+            print(room)
+            print(rect_screen)
+            if not room.in_rect(rect_screen):
+                print("bad")
+            else:
+                print("good")
+                rooms.append(room)
+
+
+            self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
+
+
+            # self.game.spawn('player', **{
+            #     'x': r1.get_center()[0],
+            #     'y': r1.get_center()[1]})
+
+    def test_gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
         x=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
         r1 = Rect(
