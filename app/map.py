@@ -5,7 +5,7 @@ from app import colors
 
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
-ROOMS_MAX = 30
+# ROOMS_MAX = 90
 ROOMS_MAX_FAILURES = 20
 
 @unique
@@ -27,6 +27,12 @@ class Rect:
         center_x = (self.x1 + self.x2) // 2
         center_y = (self.y1 + self.y2) // 2
         return (center_x, center_y)
+
+    def width(self):
+        return self.x2 - self.x1
+
+    def height(self):
+        return self.y2 - self.y1
 
     def in_rect(self, other):
         return (
@@ -92,7 +98,7 @@ class Map:
         rooms = []
 
         # for room_id in range(ROOMS_MAX):
-        for room_id in range(8):
+        for room_id in range(40):
             room = Rect(
                 x=randint(0, self.tiles_x),
                 y=randint(0, self.tiles_y),
@@ -104,19 +110,22 @@ class Map:
             if not room.in_rect(rect_screen):
                 continue
 
+            valid_room = True
             for other in rooms:
                 if room.intersect(other):
+                    valid_room = False
                     print("\tcollide: \t{}".format(other))
-                    continue
+                    print("\tself: \t\t{}".format(room))
+                    break
 
-            self.game.spawn('debug', **{
-                'char': room_id,
-                'x': room.x1,
-                'y': room.y1})
-            rooms.append(room)
+            if valid_room:
+                rooms.append(room)
+                self.game.spawn('debug', **{
+                    'char': room_id,
+                    'x': room.x1,
+                    'y': room.y1})
 
-
-            # print(room)
+        # print(room)
             # print(rect_screen)
             # # todo: when scrolling, would need to be rect_map not rect_screen
             # if not room.in_rect(rect_screen):
@@ -125,7 +134,7 @@ class Map:
             #     print("good")
             #     rooms.append(room)
             #
-            #
+
         for room in rooms:
             self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
             self.game.spawn('player', **{

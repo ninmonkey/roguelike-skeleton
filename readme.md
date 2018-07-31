@@ -4,7 +4,11 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- fix rect intersect and is_onscreen
+- !! fix rect intersect off-by-one?
+
+
+
+
 - todo: disable input event auto-repeat
     - make key input based on state? 
 

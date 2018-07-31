@@ -8,6 +8,7 @@ from app.render import (
     render_blit,
     render_clear_all,
     render_entities,
+    random_font_path,
 )
 
 from app.map import Map
@@ -142,15 +143,22 @@ class Game:
             elif event.key == 'RIGHT':
                 return {'move': (1, 0)}
 
-            if event.key == 'SPACE':
+            elif event.key == 'PAGEUP':
+                pass
+            elif event.key == 'PAGEDOWN':
+                pass
+
+            elif event.key == 'SPACE':
                 self.init()
             elif event.key == 'ESCAPE':
                 return {'exit': True}
             elif event.key == 'ENTER' and event.alt:
                 return {'fullscreen': True}
 
-        elif event.type == 'KEYUP':
-            pass
+        # mice
+        elif event.type == 'MOUSEDOWN':
+            if event.button == 'LEFT':
+                self.player.teleport_to(*event.cell)
 
         return None
 
