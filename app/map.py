@@ -64,12 +64,23 @@ class Map:
         self.tiles = [[]]
         self.game = game
 
-    def reset(self, tiles_x, tiles_y):
+    def reset(self, tiles_x, tiles_y, tile_id=None):
+        if tile_id is None:
+            tile_id = TileId.WALL
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
-        self.tiles = [[Tile(TileId.WALL) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        self.tiles = [[Tile(tile_id) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
     def gen_random_map(self):
+        self.reset(self.tiles_x, self.tiles_y)
+        r1 = Rect(randint(20, 30), 15, 10, 15)
+        self.create_room(r1)
+
+        self.game.spawn('player', **{
+            'x': r1.get_center()[0],
+            'y': r1.get_center()[1]})
+
+    def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
         r1 = Rect(20, 15, 10, 15)
         r2 = Rect(50, 15, 10, 15)
@@ -84,40 +95,6 @@ class Map:
         self.game.spawn('monster', **{
             'x': r2.get_center()[0],
             'y': r2.get_center()[1]})
-
-    def gen_static_map(self):
-        self.reset(self.tiles_x, self.tiles_y)
-
-        self.create_room(Rect(0, 0, 1, 2))
-
-        x = 1
-        y = 1
-        self.create_room(Rect(x, y, 3, 3))
-        self.create_room(Rect(x+3, y, 1, 1))
-
-        x += 4
-        self.create_room(Rect(x, y, 3, 3))
-
-        x -= 4
-        y += 4
-        self.create_room(Rect(3, 4, 1, 1))
-        self.create_room(Rect(7, 4, 1, 1))
-        self.create_room(Rect(1, 5, 3, 3))
-
-        x += 4
-        self.create_room(Rect(x, y, 3, 3))
-
-        self.create_tunnel_horizontal(10, 30, 30)
-        self.create_tunnel_vertical(10, 30, 10)
-        self.create_tunnel_horizontal(10, 30, 10)
-        self.create_tunnel_vertical(10, 30, 30)
-
-        r = Rect(18, 18, 5, 5)
-        self.create_room(r)
-
-        self.game.spawn("player", {
-            'x': r.get_center()[0],
-            'y': r.get_center()[1], })
 
     def in_bounds(self, x, y):
         # is tile on map
@@ -135,7 +112,9 @@ class Map:
         else:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
-    def create_room(self, rect):
+    def create_room(self, rect, tile_id=None):
+        if tile_id is None:
+            tile_id = TileId.FLOOR
         # [x1, x2), [y1, y2)
         if any([rect.x1 > rect.x2,
                 rect.y1 > rect.y2]):
@@ -146,18 +125,24 @@ class Map:
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
-                self.at(x, y).set_type(TileId.FLOOR)
+                self.at(x, y).set_type(tile_id)
 
-    def create_tunnel_horizontal(self, x1, x2, y):
+    def create_tunnel_horizontal(self, x1, x2, y, tile_id=None):
         # naive horizontal line.
+        if tile_id is None:
+            tile_id = TileId.FLOOR
+
         # todo: replace with single (x1,y1)->(x2,y2) or (x1, y1, angle, length)
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.at(x, y).set_type(TileId.FLOOR)
+            self.at(x, y).set_type(tile_id)
 
-    def create_tunnel_vertical(self, y1, y2, x):
+    def create_tunnel_vertical(self, y1, y2, x, tile_id=None):
         # todo: replace this and create_tunnel_horizontal()
+        if tile_id is None:
+            tile_id = TileId.FLOOR
+
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.at(x, y).set_type(TileId.FLOOR)
+            self.at(x, y).set_type(tile_id)
 
     def is_blocked(self, x, y):
         # default to failed bounds check
