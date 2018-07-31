@@ -1,9 +1,17 @@
+from enum import Enum
+
+from random import randint
+from app import colors
+
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
 ROOMS_MAX = 30
 ROOMS_MAX_FAILURES = 20
 
-from app import colors
+
+class TileId(Enum):
+    WALL = 0
+    FLOOR = 1
 
 
 class Rect:
@@ -28,22 +36,23 @@ class Rect:
 
 class Tile:
     # default to block both if block=True
-    def __init__(self, tile, blocking=False, visible=None):
-
+    def __init__(self, tile_id, blocking=False):
         self.blocking = blocking
-        self.visible = True
         self.color = colors.white
-        self.set_type(tile)
+        self.value = 0
+        self.set_type(tile_id)
 
-    def set_type(self, tile):
-        if tile == 'floor':
+    def set_type(self, tile_id):
+        self.value = tile_id.value
+
+        if tile_id is TileId.FLOOR:
             self.blocking = False
             self.color = colors.dark_floor
-        elif tile == 'wall':
+        elif tile_id == TileId.WALL:
             self.blocking = True
             self.color = colors.dark_wall
         else:
-            raise ValueError("Unknown tile type: {}".format(tile))
+            raise ValueError("Unknown tile type: {}".format(tile_id))
 
 
 
@@ -58,7 +67,7 @@ class Map:
     def reset(self, tiles_x, tiles_y):
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
-        self.tiles = [[Tile('wall') for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        self.tiles = [[Tile(TileId.WALL) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
     def gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -137,18 +146,18 @@ class Map:
         end_y = min(rect.y2, self.tiles_y)
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
-                self.at(x, y).set_type('floor')
+                self.at(x, y).set_type(TileId.FLOOR)
 
     def create_tunnel_horizontal(self, x1, x2, y):
         # naive horizontal line.
         # todo: replace with single (x1,y1)->(x2,y2) or (x1, y1, angle, length)
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.at(x, y).set_type('floor')
+            self.at(x, y).set_type(TileId.FLOOR)
 
     def create_tunnel_vertical(self, y1, y2, x):
         # todo: replace this and create_tunnel_horizontal()
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.at(x, y).set_type('floor')
+            self.at(x, y).set_type(TileId.FLOOR)
 
     def is_blocked(self, x, y):
         # default to failed bounds check
