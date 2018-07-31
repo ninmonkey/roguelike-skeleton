@@ -88,41 +88,41 @@ class Map:
     def gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y, tile_id=TileId.WALL)
 
-        r1 = Rect(
-            x=randint(0, self.tiles_x),
-            y=randint(0, self.tiles_y),
-            w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
-            h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
-        )
         rect_screen = Rect(0, 0, self.tiles_x, self.tiles_y)
         rooms = []
-        # print(rect_screen)
-        # print(r1)
-        # if not r1.intersect(rect_screen):
-        #     print("Warning: room outside map!")
 
-        for room_id in range(1):
+        for room_id in range(5):
             room = Rect(
                 x=randint(0, self.tiles_x),
                 y=randint(0, self.tiles_y),
                 w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
                 h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
             )
-            print(room)
-            print(rect_screen)
+            print("Room [{}] = {}".format(room_id, room))
+
             if not room.in_rect(rect_screen):
-                print("bad")
+                continue
             else:
-                print("good")
                 rooms.append(room)
 
 
+            # print(room)
+            # print(rect_screen)
+            # # todo: when scrolling, would need to be rect_map not rect_screen
+            # if not room.in_rect(rect_screen):
+            #     pass
+            # else:
+            #     print("good")
+            #     rooms.append(room)
+            #
+            #
+        for room in rooms:
             self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
+            self.game.spawn('player', **{
+                'x': room.get_center()[0],
+                'y': room.get_center()[1]})
 
-
-            # self.game.spawn('player', **{
-            #     'x': r1.get_center()[0],
-            #     'y': r1.get_center()[1]})
+        print("Rooms used: {}".format(len(rooms)))
 
     def test_gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -174,6 +174,7 @@ class Map:
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
             'y': r1.get_center()[1]})
+
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
