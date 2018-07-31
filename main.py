@@ -84,9 +84,6 @@ class Game:
         else:
             raise ValueError("Unknown spawn type: {}".format(name))
 
-    # def add_entity(self, entity):
-    #     self.entities.append(entity)
-
     def draw(self):
         # map
         for y in range(self.TILES_Y):
@@ -138,10 +135,13 @@ class Game:
             elif event.key == 'RIGHT':
                 return {'move': (1, 0)}
 
-            if event.key == 'ENTER' and user_input.alt:
-                return {'fullscreen': True}
+            if event.key == 'SPACE':
+                self.init()
             elif event.key == 'ESCAPE':
                 return {'exit': True}
+            elif event.key == 'ENTER' and event.alt:
+                return {'fullscreen': True}
+
         elif event.type == 'KEYUP':
             pass
 
