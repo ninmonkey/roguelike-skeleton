@@ -12,6 +12,8 @@ ROOMS_MAX_FAILURES = 20
 class TileId(Enum):
     WALL = 0
     FLOOR = 1
+    GRASS = 2
+    RANDOM = 999
 
 
 class Rect:
@@ -44,16 +46,19 @@ class Tile:
 
     def set_type(self, tile_id):
         self.value = tile_id.value
+        self.blocking = False
 
         if tile_id is TileId.FLOOR:
-            self.blocking = False
             self.color = colors.dark_floor
-        elif tile_id == TileId.WALL:
+        elif tile_id is TileId.WALL:
             self.blocking = True
             self.color = colors.dark_wall
+        elif tile_id is TileId.GRASS:
+            self.color = colors.dark_green
+        # elif tile_id is TileId.RANDOM:
+        #     self.color = colors.random_color()
         else:
             raise ValueError("Unknown tile type: {}".format(tile_id))
-
 
 
 class Map:
@@ -73,8 +78,25 @@ class Map:
 
     def gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
-        r1 = Rect(randint(20, 30), 15, 10, 15)
-        self.create_room(r1)
+        x=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
+        r1 = Rect(
+            x=x,
+            y=2,
+            w=4,
+            h=4
+        )
+        r2 = Rect(
+            x=r1.x2+1,
+            y=2,
+            w=4,
+            h=4
+        )
+        self.create_room(r1, tile_id=TileId.FLOOR, color=colors.random_color())
+        self.create_room(r2, tile_id=TileId.FLOOR, color=colors.random_color())
+
+        print(r1.intersect(r2))
+        print(r2.intersect(r1))
+
 
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
@@ -112,9 +134,10 @@ class Map:
         else:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
-    def create_room(self, rect, tile_id=None):
+    def create_room(self, rect, tile_id=None, color=None):
         if tile_id is None:
             tile_id = TileId.FLOOR
+
         # [x1, x2), [y1, y2)
         if any([rect.x1 > rect.x2,
                 rect.y1 > rect.y2]):
@@ -126,6 +149,8 @@ class Map:
         for x in range(rect.x1, end_x):
             for y in range(rect.y1, end_y):
                 self.at(x, y).set_type(tile_id)
+                if color is not None:
+                    self.at(x, y).color = color
 
     def create_tunnel_horizontal(self, x1, x2, y, tile_id=None):
         # naive horizontal line.

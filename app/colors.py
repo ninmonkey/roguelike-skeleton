@@ -1,3 +1,5 @@
+from random import randint
+
 # todo: rewrite as dict Or at least refactor to be internally-consistent
 
 def gen_gray_percent(fraction, base):
@@ -6,12 +8,26 @@ def gen_gray_percent(fraction, base):
     b = int(fraction * base)
     return r, g, b
 
+def random_color():
+    return randint(0, 255), randint(0, 255), randint(0, 255)
+
+def random_hue():
+    raise NotImplementedError('wip HSL randomized color')
+
+# def gen_color_percent(color1, percent_r, percent_g, percent_b):
+#     r = int(color1[0] * percent_r)
+#     g = int(color1[1] * percent_g)
+#     b = int(color1[2] * percent_b)
+#     return r, g, b
+
 
 yellow = (255, 255, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 red_dark = (80, 0, 0)
+green = (0, 255, 0)
+dark_green = (60, 140, 60)
 
 gray_0 = black
 gray_10 = gen_gray_percent(0.1, 255)
