@@ -79,7 +79,14 @@ class Game:
         elif name == 'monster':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
-            spawn = Entity(x, y, 'X', colors.yellow, self)
+            char = str(kwargs.get('char','X'))
+            spawn = Entity(x, y, char, colors.yellow, self)
+            self.entities.append(spawn)
+        elif name == 'debug':
+            x = kwargs.get('x', 0)
+            y = kwargs.get('y', 0)
+            char = str(kwargs.get('char','X'))
+            spawn = Entity(x, y, char, colors.black, self)
             self.entities.append(spawn)
         else:
             raise ValueError("Unknown spawn type: {}".format(name))

@@ -91,7 +91,8 @@ class Map:
         rect_screen = Rect(0, 0, self.tiles_x, self.tiles_y)
         rooms = []
 
-        for room_id in range(5):
+        # for room_id in range(ROOMS_MAX):
+        for room_id in range(8):
             room = Rect(
                 x=randint(0, self.tiles_x),
                 y=randint(0, self.tiles_y),
@@ -102,8 +103,17 @@ class Map:
 
             if not room.in_rect(rect_screen):
                 continue
-            else:
-                rooms.append(room)
+
+            for other in rooms:
+                if room.intersect(other):
+                    print("\tcollide: \t{}".format(other))
+                    continue
+
+            self.game.spawn('debug', **{
+                'char': room_id,
+                'x': room.x1,
+                'y': room.y1})
+            rooms.append(room)
 
 
             # print(room)
