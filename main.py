@@ -113,46 +113,39 @@ class Game:
         while not self.is_done and not tdl.event.is_window_closed():
             self.draw()
 
-            # todo: (verify) but I think this consumes only one event per loop
-            # input
             for event in tdl.event.get():
-                if event.type == 'KEYDOWN':
-                    user_input = event
-                    break
-            else:
-                user_input = None
+                action = self.handle_input(event)
 
-            if not user_input:
-                continue
+                if action:
+                    if action.get('move'):
+                        self.player.move(*action.get('move'))
 
-            action = self.handle_input(user_input)
+                    if action.get('exit'):
+                        self.is_done = True
 
-            if action.get('move'):
-                self.player.move(*action.get('move'))
+                    if action.get('fullscreen'):
+                        tdl.set_fullscreen(not tdl.get_fullscreen())
 
-            if action.get('exit'):
-                self.is_done = True
-
-            if action.get('fullscreen'):
-                tdl.set_fullscreen(not tdl.get_fullscreen())
-
-    def handle_input(self, user_input):
+    def handle_input(self, event):
         # Movement keys
-        if user_input.key == 'UP':
-            return {'move': (0, -1)}
-        elif user_input.key == 'DOWN':
-            return {'move': (0, 1)}
-        elif user_input.key == 'LEFT':
-            return {'move': (-1, 0)}
-        elif user_input.key == 'RIGHT':
-            return {'move': (1, 0)}
+        if event.type == 'KEYDOWN':
+            if event.key == 'UP':
+                return {'move': (0, -1)}
+            elif event.key == 'DOWN':
+                return {'move': (0, 1)}
+            elif event.key == 'LEFT':
+                return {'move': (-1, 0)}
+            elif event.key == 'RIGHT':
+                return {'move': (1, 0)}
 
-        if user_input.key == 'ENTER' and user_input.alt:
-            return {'fullscreen': True}
-        elif user_input.key == 'ESCAPE':
-            return {'exit': True}
+            if event.key == 'ENTER' and user_input.alt:
+                return {'fullscreen': True}
+            elif event.key == 'ESCAPE':
+                return {'exit': True}
+        elif event.type == 'KEYUP':
+            pass
 
-        return {}
+        return None
 
 
 def main():

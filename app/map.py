@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, unique
 
 from random import randint
 from app import colors
@@ -8,7 +8,7 @@ ROOM_MIN_SIZE = 6
 ROOMS_MAX = 30
 ROOMS_MAX_FAILURES = 20
 
-
+@unique
 class TileId(Enum):
     WALL = 0
     FLOOR = 1
