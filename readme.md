@@ -4,9 +4,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- !! fix rect intersect off-by-one?
-
-
+- !! fix rect intersect off-by-one? 
 
 
 - todo: disable input event auto-repeat
@@ -41,12 +39,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 fonts:
     https://github.com/libtcod/python-tcod/tree/master/fonts/libtcod
-    
-    better fonts:
-        arial10x10.png
-        arial12x12.png
-        lucida12x12_gs_tc.png
-    
+        
 colors:
     http://roguecentral.org/doryen/data/libtcod/doc/1.5.1/html2/color.html?c=false&cpp=false&cs=false&py=true&lua=false
     

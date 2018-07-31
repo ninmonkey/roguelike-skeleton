@@ -1,13 +1,14 @@
+import os
+import random
 from app import colors
 
 
 # todo: better rename funcs now that they are under namespace
 
-def random_font_path():
-    font_dir = os.path.join(PATH_APP_ROOT, 'fonts')
-    fonts = os.listdir(font_dir)
+def random_font_path(path_app_root):
+    font_dir = os.path.join(path_app_root, 'fonts')
+    fonts = [x for x in os.listdir(font_dir) if not os.path.isdir(x)]
     path = os.path.join(font_dir, random.choice(fonts))
-    print("Font: {}".format(path))
     return path
 
 

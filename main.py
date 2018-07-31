@@ -47,8 +47,16 @@ class Game:
     """
     def __init__(self):
         self.init()
-        # path = random_font_path()
-        path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial10x10.png')
+        path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
+        tdl.set_font(path, greyscale=True, altLayout=True)
+        self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
+        self.con = tdl.Console(self.TILES_X, self.TILES_Y)
+        tdl.setFPS(LIMIT_FPS)
+
+    def re_init_font(self):
+        # allows reloading of font
+        path = random_font_path(PATH_APP_ROOT)
+        print("font: ", path)
         tdl.set_font(path, greyscale=True, altLayout=True)
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
@@ -144,9 +152,10 @@ class Game:
                 return {'move': (1, 0)}
 
             elif event.key == 'PAGEUP':
-                pass
+                self.re_init_font()
+
             elif event.key == 'PAGEDOWN':
-                pass
+                self.re_init_font()
 
             elif event.key == 'SPACE':
                 self.init()
@@ -159,6 +168,7 @@ class Game:
         elif event.type == 'MOUSEDOWN':
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
+                print("Cell: {}".format(event.cell))
 
         return None
 
