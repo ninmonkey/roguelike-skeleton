@@ -29,6 +29,7 @@ class Rect:
         return (center_x, center_y)
 
     def intersect(self, other):
+        # off-by-one error, see Map() create_room
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
@@ -86,17 +87,42 @@ class Map:
             h=4
         )
         r2 = Rect(
-            x=r1.x2+1,
-            y=2,
+            x=r1.x2,
+            y=r1.y1,
+            w=4,
+            h=4
+        )
+        r3 = Rect(
+            x=r1.x2,
+            y=r1.y1 + 4,
+            w=4,
+            h=4
+        )
+        r4 = Rect(
+            x=r1.x1,
+            y=r1.y1 + 4,
             w=4,
             h=4
         )
         self.create_room(r1, tile_id=TileId.FLOOR, color=colors.random_color())
         self.create_room(r2, tile_id=TileId.FLOOR, color=colors.random_color())
+        self.create_room(r3, tile_id=TileId.FLOOR, color=colors.random_color())
+        self.create_room(r4, tile_id=TileId.FLOOR, color=colors.random_color())
 
+        print(r1)
+        print(r4)
+        print(r1.intersect(r4))
+        print(r4.intersect(r1))
+
+        print(r1)
+        print(r2)
         print(r1.intersect(r2))
         print(r2.intersect(r1))
 
+        print(r3)
+        print(r4)
+        print(r3.intersect(r3))
+        print(r4.intersect(r4))
 
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
