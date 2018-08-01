@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 
@@ -13,9 +14,11 @@ from app.render import (
 
 from app.map import Map
 
-LIMIT_FPS = 20
-PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+# logger = logging.getLogger(__name__)
+logging.basicConfig(filename=os.path.join('logs','log.txt'), level=logging.DEBUG)
 
+LIMIT_FPS = 60
+PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 class Entity:
     def __init__(self, x, y, char, color, game):
@@ -60,11 +63,12 @@ class Game:
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
         tdl.setFPS(LIMIT_FPS)
+        logging.debug("FPS: {}".format(LIMIT_FPS))
 
     def re_init_font(self):
         # allows reloading of font
         path = random_font_path(PATH_APP_ROOT)
-        print("font: ", path)
+        logging.info("font: ", path)
         tdl.set_font(path, greyscale=True, altLayout=True)
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
@@ -164,11 +168,11 @@ class Game:
             elif event.key == '1':
                 self.map.room_gen_padding -= 1
                 self.map.room_gen_padding = max(self.map.room_gen_padding, 0)
-                print("room padding: {}".format(self.map.room_gen_padding))
+                logging.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
             elif event.key == '2':
                 self.map.room_gen_padding += 1
-                print("room padding: {}".format(self.map.room_gen_padding))
+                logging.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
 
             elif event.key == 'F1':
@@ -190,7 +194,7 @@ class Game:
         elif event.type == 'MOUSEDOWN':
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
-                print("Cell: {}".format(event.cell))
+                logging.info("Cell: {}".format(event.cell))
 
         return None
 

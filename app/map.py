@@ -1,4 +1,5 @@
 from enum import Enum, unique
+import logging
 from random import randint
 import time
 
@@ -6,7 +7,7 @@ from app import colors
 
 ROOM_MAX_SIZE = 9
 ROOM_MIN_SIZE = 3
-ROOMS_MAX = 999999
+ROOMS_MAX = 20
 ROOMS_MAX_FAILURES = 20
 ROOMS_MAX_TIMEOUT_SECS = .6
 
@@ -111,14 +112,13 @@ class Map:
 
         time_start = time.time()
         while room_id < ROOMS_MAX and time.time() - time_start <= ROOMS_MAX_TIMEOUT_SECS:
-            print(room_id)
             room = Rect(
                 x=randint(0, self.tiles_x),
                 y=randint(0, self.tiles_y),
                 w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
                 h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
             )
-            print("Room [{}] = {}".format(room_id, room))
+            logging.info("Room [{}] = {}".format(room_id, room))
 
             if not room.in_rect(rect_map):
                 continue
@@ -127,8 +127,8 @@ class Map:
             for other in rooms:
                 if room.intersect(other, padding=self.room_gen_padding):
                     valid_room = False
-                    print("\tcollide: \t{}".format(other))
-                    print("\tself: \t\t{}".format(room))
+                    logging.debug("\tcollide: \t{}".format(other))
+                    logging.debug("\tself: \t\t{}".format(room))
                     break
 
             if valid_room:
@@ -149,7 +149,7 @@ class Map:
                 'x': room.get_center()[0],
                 'y': room.get_center()[1]})
 
-        print("Rooms used: {}".format(len(rooms)))
+        logging.info("Rooms used: {}".format(len(rooms)))
 
     def test_gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -183,20 +183,20 @@ class Map:
         self.create_room(r3, tile_id=TileId.FLOOR, color=colors.random_color())
         self.create_room(r4, tile_id=TileId.FLOOR, color=colors.random_color())
 
-        print(r1)
-        print(r4)
-        print(r1.intersect(r4))
-        print(r4.intersect(r1))
-
-        print(r1)
-        print(r2)
-        print(r1.intersect(r2))
-        print(r2.intersect(r1))
-
-        print(r3)
-        print(r4)
-        print(r3.intersect(r3))
-        print(r4.intersect(r4))
+        # logging.debug(r1)
+        # logging.debug(r4)
+        # logging.debug(r1.intersect(r4))
+        # logging.debug(r4.intersect(r1))
+        #
+        # logging.debug(r1)
+        # logging.debug(r2)
+        # logging.debug(r1.intersect(r2))
+        # logging.debug(r2.intersect(r1))
+        #
+        # logging.debug(r3)
+        # logging.debug(r4)
+        # logging.debug(r3.intersect(r3))
+        # logging.debug(r4.intersect(r4))
 
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
@@ -242,7 +242,7 @@ class Map:
         # [x1, x2), [y1, y2)
         if any([rect.x1 > rect.x2,
                 rect.y1 > rect.y2]):
-            print("Bad create_room() args: {}".format(rect))
+            logging.warning("Bad create_room() args: {}".format(rect))
             return
 
         end_x = min(rect.x2, self.tiles_x)

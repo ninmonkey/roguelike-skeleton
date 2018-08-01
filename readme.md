@@ -4,15 +4,13 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- switch to logging (redirect to console) 
+- switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
 
 - todo: disable input event auto-repeat
     - make key input based on state? 
 
-- spawn factory which map can access (eg: Game.spawn(..))
 - separate screen_tiles_x from map_tiles_x for scrolling
-- text: player loc, monster count, fps.
-- tiles enum?
+- text: player loc, monster count, fps. 
 
 # real-time vs turn-based
 
