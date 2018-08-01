@@ -4,8 +4,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- !! fix rect intersect off-by-one? 
-
+- switch to logging (redirect to console) 
 
 - todo: disable input event auto-repeat
     - make key input based on state? 

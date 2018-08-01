@@ -46,6 +46,14 @@ class Game:
 
     """
     def __init__(self):
+        self.is_done = False
+        self.TILES_X = 80
+        self.TILES_Y = 50
+        self.entities = []
+        self.player = None
+        self.map = Map(self.TILES_X, self.TILES_Y, self)
+        self.map.debug_show_colors = True
+
         self.init()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
         tdl.set_font(path, greyscale=True, altLayout=True)
@@ -68,8 +76,7 @@ class Game:
         self.TILES_X = 80
         self.TILES_Y = 50
         self.entities = []
-        self.player = None
-        self.map = Map(self.TILES_X, self.TILES_Y, self)
+        self.map.reset(self.TILES_X, self.TILES_Y)
         self.player = self.spawn("player")
 
         self.map.gen_random_map()
@@ -142,6 +149,8 @@ class Game:
     def handle_input(self, event):
         # Movement keys
         if event.type == 'KEYDOWN':
+            # print(event)
+            # player
             if event.key == 'UP':
                 return {'move': (0, -1)}
             elif event.key == 'DOWN':
@@ -151,9 +160,22 @@ class Game:
             elif event.key == 'RIGHT':
                 return {'move': (1, 0)}
 
+            # debug / map / etc
+            elif event.key == '1':
+                self.map.room_gen_padding -= 1
+                self.map.room_gen_padding = max(self.map.room_gen_padding, 0)
+                print("room padding: {}".format(self.map.room_gen_padding))
+                self.init()
+            elif event.key == '2':
+                self.map.room_gen_padding += 1
+                print("room padding: {}".format(self.map.room_gen_padding))
+                self.init()
+
+            elif event.key == 'F1':
+                self.map.debug_show_colors = not self.map.debug_show_colors
+                self.init()
             elif event.key == 'PAGEUP':
                 self.re_init_font()
-
             elif event.key == 'PAGEDOWN':
                 self.re_init_font()
 
@@ -173,6 +195,9 @@ class Game:
         return None
 
 
+
+
+
 def main():
     g = Game()
     g.loop()
@@ -180,4 +205,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print("To view hotkeys, see Game.handle_input")
     print('Done.')

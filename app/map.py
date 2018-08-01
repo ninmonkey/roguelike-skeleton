@@ -1,12 +1,14 @@
 from enum import Enum, unique
-
 from random import randint
+import time
+
 from app import colors
 
-ROOM_MAX_SIZE = 10
-ROOM_MIN_SIZE = 6
-# ROOMS_MAX = 90
+ROOM_MAX_SIZE = 9
+ROOM_MIN_SIZE = 3
+ROOMS_MAX = 999999
 ROOMS_MAX_FAILURES = 20
+ROOMS_MAX_TIMEOUT_SECS = .6
 
 @unique
 class TileId(Enum):
@@ -42,10 +44,14 @@ class Rect:
             self.y2 >= other.y1 and self.y2 <= other.y2
         )
 
-    def intersect(self, other):
+    def intersect(self, other, padding=0):
         # off-by-one error, see Map() create_room
-        return (self.x1 <= other.x2 and self.x2 >= other.x1 and
-                self.y1 <= other.y2 and self.y2 >= other.y1)
+        if padding >= 0:
+            return (self.x1 - padding < other.x2 and self.x2 + padding > other.x1 and
+                    self.y1 - padding < other.y2 and self.y2 + padding > other.y1)
+        else:
+            return (self.x1 < other.x2 and self.x2 > other.x1 and
+                    self.y1 < other.y2 and self.y2 > other.y1)
 
     def __str__(self):
         return "Rect(x1={}, y1={}, x2={}, y2={})".format(self.x1, self.y1, self.x2, self.y2)
@@ -83,6 +89,8 @@ class Map:
         self.reset(self.tiles_x, self.tiles_y)
         self.tiles = [[]]
         self.game = game
+        self.debug_show_colors = True
+        self.room_gen_padding = 0
 
     def reset(self, tiles_x, tiles_y, tile_id=None):
         if tile_id is None:
@@ -94,11 +102,16 @@ class Map:
     def gen_random_map(self):
         self.reset(self.tiles_x, self.tiles_y, tile_id=TileId.WALL)
 
-        rect_screen = Rect(0, 0, self.tiles_x, self.tiles_y)
+        rect_map = Rect(0, 0, self.tiles_x, self.tiles_y)
         rooms = []
 
         # for room_id in range(ROOMS_MAX):
-        for room_id in range(40):
+        # for room_id in range(300):
+        room_id = 0
+
+        time_start = time.time()
+        while room_id < ROOMS_MAX and time.time() - time_start <= ROOMS_MAX_TIMEOUT_SECS:
+            print(room_id)
             room = Rect(
                 x=randint(0, self.tiles_x),
                 y=randint(0, self.tiles_y),
@@ -107,12 +120,12 @@ class Map:
             )
             print("Room [{}] = {}".format(room_id, room))
 
-            if not room.in_rect(rect_screen):
+            if not room.in_rect(rect_map):
                 continue
 
             valid_room = True
             for other in rooms:
-                if room.intersect(other):
+                if room.intersect(other, padding=self.room_gen_padding):
                     valid_room = False
                     print("\tcollide: \t{}".format(other))
                     print("\tself: \t\t{}".format(room))
@@ -120,23 +133,18 @@ class Map:
 
             if valid_room:
                 rooms.append(room)
+                room_id += 1
                 self.game.spawn('debug', **{
                     'char': room_id,
                     'x': room.x1,
                     'y': room.y1})
 
-        # print(room)
-            # print(rect_screen)
-            # # todo: when scrolling, would need to be rect_map not rect_screen
-            # if not room.in_rect(rect_screen):
-            #     pass
-            # else:
-            #     print("good")
-            #     rooms.append(room)
-            #
-
         for room in rooms:
-            self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
+            if self.debug_show_colors:
+                self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
+            else:
+                self.create_room(room, tile_id=TileId.FLOOR, color=None)
+
             self.game.spawn('player', **{
                 'x': room.get_center()[0],
                 'y': room.get_center()[1]})
