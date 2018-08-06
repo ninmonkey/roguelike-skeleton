@@ -132,6 +132,15 @@ class Map:
                     break
 
             if valid_room:
+                if room_id == 0:
+                    self.game.spawn('player', **{
+                        'x': room.get_center()[0],
+                        'y': room.get_center()[1]})
+                else:
+                    self.game.spawn('monster', **{
+                        'x': room.get_center()[0],
+                        'y': room.get_center()[1]})
+
                 rooms.append(room)
                 room_id += 1
                 self.game.spawn('debug', **{
@@ -144,10 +153,6 @@ class Map:
                 self.create_room(room, tile_id=TileId.FLOOR, color=colors.random_color())
             else:
                 self.create_room(room, tile_id=TileId.FLOOR, color=None)
-
-            self.game.spawn('player', **{
-                'x': room.get_center()[0],
-                'y': room.get_center()[1]})
 
         logging.info("Rooms used: {}".format(len(rooms)))
 
