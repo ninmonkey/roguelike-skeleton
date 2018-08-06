@@ -159,6 +159,7 @@ class Map:
             prev_room = rooms[counter-1]
             pos_prev = prev_room.get_center()
             pos_room = room.get_center()
+
             if randint(0, 1):
                 self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_prev[1])
                 self.create_tunnel_vertical(pos_prev[1], pos_room[1], pos_room[0])
@@ -166,70 +167,7 @@ class Map:
                 self.create_tunnel_vertical(pos_prev[1], pos_room[1], pos_prev[0])
                 self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_room[1])
 
-
-            # for other in rooms[:]:
-            #     if room == other:
-            #         continue
-            #
-            #     pos1 = room.get_center()
-            #     pos2 = other.get_center()
-            #     self.create_tunnel_horizontal(pos1[0], pos2[0], pos1[1])
-            #     self.create_tunnel_vertical(pos1[0], pos2[0], pos1[1])
-
-
-
         logging.info("Rooms used: {}".format(len(rooms)))
-
-    def test_gen_random_map(self):
-        self.reset(self.tiles_x, self.tiles_y)
-        x=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
-        r1 = Rect(
-            x=x,
-            y=2,
-            w=4,
-            h=4
-        )
-        r2 = Rect(
-            x=r1.x2,
-            y=r1.y1,
-            w=4,
-            h=4
-        )
-        r3 = Rect(
-            x=r1.x2,
-            y=r1.y1 + 4,
-            w=4,
-            h=4
-        )
-        r4 = Rect(
-            x=r1.x1,
-            y=r1.y1 + 4,
-            w=4,
-            h=4
-        )
-        self.create_room(r1, tile_id=TileId.FLOOR, color=colors.random_color())
-        self.create_room(r2, tile_id=TileId.FLOOR, color=colors.random_color())
-        self.create_room(r3, tile_id=TileId.FLOOR, color=colors.random_color())
-        self.create_room(r4, tile_id=TileId.FLOOR, color=colors.random_color())
-
-        # logging.debug(r1)
-        # logging.debug(r4)
-        # logging.debug(r1.intersect(r4))
-        # logging.debug(r4.intersect(r1))
-        #
-        # logging.debug(r1)
-        # logging.debug(r2)
-        # logging.debug(r1.intersect(r2))
-        # logging.debug(r2.intersect(r1))
-        #
-        # logging.debug(r3)
-        # logging.debug(r4)
-        # logging.debug(r3.intersect(r3))
-        # logging.debug(r4.intersect(r4))
-
-        self.game.spawn('player', **{
-            'x': r1.get_center()[0],
-            'y': r1.get_center()[1]})
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -250,9 +188,9 @@ class Map:
     def in_bounds(self, x, y):
         # is tile on map
         if any([x < 0,
-                x > self.tiles_x,
+                x >= self.tiles_x,
                 y < 0,
-                y > self.tiles_y]):
+                y >= self.tiles_y]):
             return False
 
         return True
