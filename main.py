@@ -20,6 +20,7 @@ logging.basicConfig(filename=os.path.join('logs','log.txt'), level=logging.DEBUG
 LIMIT_FPS = 60
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+
 class Entity:
     def __init__(self, x, y, char, color, game):
         self.x = x

@@ -5,7 +5,9 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 # todo:
 
 - switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
-
+- rotate logs:
+    https://docs.python.org/3.1/library/logging.html
+    
 - todo: disable input event auto-repeat
     - make key input based on state? 
 
@@ -33,6 +35,9 @@ code mostly based on http://rogueliketutorials.com/libtcod/
         is blocking                   
     
 # tdl / libtcod docs and references
+
+line of sight options:
+    http://www.roguebasin.com/index.php?title=Comparative_study_of_field_of_view_algorithms_for_2D_grid_based_worlds
 
 fonts:
     https://github.com/libtcod/python-tcod/tree/master/fonts/libtcod
