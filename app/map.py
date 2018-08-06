@@ -105,12 +105,9 @@ class Map:
 
         rect_map = Rect(0, 0, self.tiles_x, self.tiles_y)
         rooms = []
-
-        # for room_id in range(ROOMS_MAX):
-        # for room_id in range(300):
         room_id = 0
-
         time_start = time.time()
+
         while room_id < ROOMS_MAX and time.time() - time_start <= ROOMS_MAX_TIMEOUT_SECS:
             room = Rect(
                 x=randint(0, self.tiles_x),
@@ -134,8 +131,9 @@ class Map:
             if valid_room:
                 rooms.append(room)
                 room_id += 1
+                # name rooms using letters
                 self.game.spawn('debug', **{
-                    'char': room_id,
+                    'char': 32+room_id,
                     'x': room.x1,
                     'y': room.y1})
 
