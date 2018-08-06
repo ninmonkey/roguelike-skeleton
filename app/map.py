@@ -145,18 +145,37 @@ class Map:
             else:
                 self.create_room(room, tile_id=TileId.FLOOR, color=None)
 
-        for counter, room in enumerate(rooms):            
+        for counter, room in enumerate(rooms):
             if counter == 0:
                 self.game.spawn('player', **{
                     'x': room.get_center()[0],
                     'y': room.get_center()[1]})
+                continue
             else:
                 self.game.spawn('monster', **{
                     'x': room.get_center()[0],
                     'y': room.get_center()[1]})
 
-            for other in rooms[:]:
-                pass
+            prev_room = rooms[counter-1]
+            pos_prev = prev_room.get_center()
+            pos_room = room.get_center()
+            if randint(0, 1):
+                self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_prev[1])
+                self.create_tunnel_vertical(pos_prev[1], pos_room[1], pos_room[0])
+            else:
+                self.create_tunnel_vertical(pos_prev[1], pos_room[1], pos_prev[0])
+                self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_room[1])
+
+
+            # for other in rooms[:]:
+            #     if room == other:
+            #         continue
+            #
+            #     pos1 = room.get_center()
+            #     pos2 = other.get_center()
+            #     self.create_tunnel_horizontal(pos1[0], pos2[0], pos1[1])
+            #     self.create_tunnel_vertical(pos1[0], pos2[0], pos1[1])
+
 
 
         logging.info("Rooms used: {}".format(len(rooms)))
@@ -211,7 +230,6 @@ class Map:
         self.game.spawn('player', **{
             'x': r1.get_center()[0],
             'y': r1.get_center()[1]})
-
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
