@@ -44,3 +44,6 @@ gray_100 = white
 dark_wall = gray_20
 dark_floor = gray_50
 
+lit_dark_wall = gray_40
+lit_dark_floor = gray_70
+

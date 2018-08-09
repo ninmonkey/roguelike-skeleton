@@ -20,6 +20,10 @@ logging.basicConfig(filename=os.path.join('logs','log.txt'), level=logging.DEBUG
 LIMIT_FPS = 60
 PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+FOV_ALGO = 'BASIC'
+FOV_LIGHT_WALL = True
+TORCH_RADIUS = 10
+
 
 class Entity:
     def __init__(self, x, y, char, color, game):
@@ -57,6 +61,7 @@ class Game:
         self.player = None
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.map.debug_show_colors = True
+        self.fov_recompute = True
 
         self.init()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
@@ -77,6 +82,7 @@ class Game:
 
     def init(self):
         # reset for next round, and first-time init.
+        self.fov_recompute = True
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
@@ -129,32 +135,42 @@ class Game:
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
     def input(self):
-        pass
+        for event in tdl.event.get():
+            action = self.handle_input(event)
+
+            if action:
+                if action.get('move'):
+                    self.player.move(*action.get('move'))
+
+                if action.get('exit'):
+                    self.is_done = True
+
+                if action.get('fullscreen'):
+                    tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def update(self):
-        pass
+        if not self.fov_recompute:
+            return
+
+        # fov()
+        self.fov_recompute = False
+
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
+            self.update()
             self.draw()
-
-            for event in tdl.event.get():
-                action = self.handle_input(event)
-
-                if action:
-                    if action.get('move'):
-                        self.player.move(*action.get('move'))
-
-                    if action.get('exit'):
-                        self.is_done = True
-
-                    if action.get('fullscreen'):
-                        tdl.set_fullscreen(not tdl.get_fullscreen())
+            self.input()
 
     def handle_input(self, event):
+        RECOMPUTE_LOS_ACTIONS = ["UP", "DOWN", "LEFT", "RIGHT"]
         # Movement keys
         if event.type == 'KEYDOWN':
             # print(event)
+
+            if event.key in RECOMPUTE_LOS_ACTIONS:
+                self.fov_recompute = True
+
             # player
             if event.key == 'UP':
                 return {'move': (0, -1)}
