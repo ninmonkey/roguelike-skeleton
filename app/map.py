@@ -63,17 +63,20 @@ class Tile:
     def __init__(self, tile_id, blocking=False):
         self.blocking = blocking
         self.color = colors.white
-        self.value = TileId.FLOOR
+        self.tile_id = TileId.FLOOR
+        self.explored = False
+        self.blocks_vision = False
         self.set_type(tile_id)
 
     def set_type(self, tile_id):
-        self.value = tile_id
+        self.tile_id = tile_id
         self.blocking = False
 
         if tile_id is TileId.FLOOR:
             self.color = colors.dark_floor
         elif tile_id is TileId.WALL:
             self.blocking = True
+            self.blocks_vision = True
             self.color = colors.dark_wall
         elif tile_id is TileId.GRASS:
             self.color = colors.dark_green
@@ -200,7 +203,10 @@ class Map:
         if self.at(x, y).blocking:
             return False
 
-        # todo: LOS test?
+        # todo: LOS test
+        # if self.at(x, y).blocks_vision:
+        #     return False
+
         return True
 
     def at(self, x, y):

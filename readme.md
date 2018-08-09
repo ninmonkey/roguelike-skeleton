@@ -4,8 +4,9 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- replace map with `tdl.map`
-    https://python-tdl.readthedocs.io/en/latest/tcod.html#module-tcod.map
+- map is **MOT** fully blocking LOS by tile type.
+    tab then LMB to test.
+    and/or it is using the wrong algorithm?
 
 - switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
 - rotate logs:

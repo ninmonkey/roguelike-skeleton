@@ -1,3 +1,4 @@
+from enum import Enum, unique
 import logging
 import os
 import random
@@ -22,7 +23,13 @@ PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
+USE_FOG_OF_WAR = False
 TORCH_RADIUS = 10
+
+@unique
+class InputMode(Enum):
+    GAME = 0
+    EDITOR = 1
 
 
 class Entity:
@@ -63,6 +70,7 @@ class Game:
         self.map.debug_show_colors = True
         self.fov_recompute = True
         self.visible_tiles = [] # todo: move to map
+        self.input_mode = InputMode.GAME
 
         self.init()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
@@ -91,6 +99,7 @@ class Game:
         self.entities = []
         self.map.reset(self.TILES_X, self.TILES_Y)
         self.player = self.spawn("player")
+        self.input_mode = InputMode.GAME
 
         self.map.gen_random_map()
 
@@ -124,10 +133,17 @@ class Game:
         # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
-                # color = self.map.at(x, y).color
+                # check for both fog of war, and tile visibility/LOS
 
-                tile_id = self.map.at(x, y).value
+                tile_id = self.map.at(x, y).tile_id
                 visible = (x, y) in self.visible_tiles
+                explored = self.map.at(x, y).explored
+
+                if not visible and not explored and USE_FOG_OF_WAR:
+                    continue
+
+                if visible and not explored:
+                    self.map.at(x, y).explored = True
 
                 if tile_id == TileId.WALL:
                     if visible:
@@ -189,8 +205,17 @@ class Game:
             self.input()
 
     def handle_input(self, event):
-        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
         # Movement keys
+        if self.input_mode == InputMode.GAME:
+            return self.handle_input_game(event)
+        elif self.input_mode == InputMode.EDITOR:
+            return self.handle_input_editor(event)
+        else:
+            raise Exception("Unknown game mode: {}".format(self.input_mode))
+
+    def handle_input_game(self, event):
+        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
+
         if event.type == 'KEYDOWN':
             # print(event)
 
@@ -208,6 +233,13 @@ class Game:
                 return {'move': (1, 0)}
 
             # debug / map / etc
+            elif event.key == 'TAB':
+                if self.input_mode == InputMode.GAME:
+                    self.input_mode = InputMode.EDITOR
+                else:
+                    self.input_mode = InputMode.GAME
+                print(self.input_mode)
+
             elif event.key == '1':
                 self.map.room_gen_padding -= 1
                 self.map.room_gen_padding = max(self.map.room_gen_padding, 0)
@@ -242,7 +274,49 @@ class Game:
 
         return None
 
+    def handle_input_editor(self, event):
+        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
 
+        if event.type == 'KEYDOWN':
+            # print(event)
+
+            if event.key in RECOMPUTE_LOS_KEYS:
+                self.fov_recompute = True
+
+            elif event.key == 'TAB':
+                if self.input_mode == InputMode.GAME:
+                    self.input_mode = InputMode.EDITOR
+                else:
+                    self.input_mode = InputMode.GAME
+                print(self.input_mode)
+
+            # player
+            if event.key == 'UP':
+                return {'move': (0, -1)}
+            elif event.key == 'DOWN':
+                return {'move': (0, 1)}
+            elif event.key == 'LEFT':
+                return {'move': (-1, 0)}
+            elif event.key == 'RIGHT':
+                return {'move': (1, 0)}
+
+            elif event.key == 'SPACE':
+                self.init()
+            elif event.key == 'ESCAPE':
+                return {'exit': True}
+
+        # mice
+        elif event.type == 'MOUSEDOWN':
+            if event.button == 'LEFT':
+                (x, y) = event.cell
+                tile_id = self.map.at(x, y).tile_id
+                if tile_id == TileId.WALL:
+                    self.map.at(x, y).tile_id = TileId.FLOOR
+                else:
+                    self.map.at(x, y).tile_id = TileId.WALL
+                self.fov_recompute = True
+
+        return None
 
 
 
@@ -252,6 +326,8 @@ def main():
 
 
 if __name__ == '__main__':
+    print("""USE_FOG_OF_WAR = {}
+TORCH_RADIUS = {}""".format(USE_FOG_OF_WAR, TORCH_RADIUS))
     main()
     print("To view hotkeys, see Game.handle_input")
     print('Done.')
