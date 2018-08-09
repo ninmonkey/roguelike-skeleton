@@ -193,6 +193,16 @@ class Map:
 
         return True
 
+    def tile_is_visible(self, x, y):
+        if not self.in_bounds(x, y):
+            return False
+
+        if self.at(x, y).blocking:
+            return False
+
+        # todo: LOS test?
+        return True
+
     def at(self, x, y):
         if self.in_bounds(x, y):
             return self.tiles[x][y]

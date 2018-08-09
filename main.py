@@ -62,6 +62,7 @@ class Game:
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.map.debug_show_colors = True
         self.fov_recompute = True
+        self.visible_tiles = [] # todo: move to map
 
         self.init()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
@@ -83,6 +84,7 @@ class Game:
     def init(self):
         # reset for next round, and first-time init.
         self.fov_recompute = True
+        self.visible_tiles = []  # todo: move to map
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
@@ -125,7 +127,7 @@ class Game:
                 # color = self.map.at(x, y).color
 
                 tile_id = self.map.at(x, y).value
-                visible = True
+                visible = (x, y) in self.visible_tiles
 
                 if tile_id == TileId.WALL:
                     if visible:
@@ -170,6 +172,14 @@ class Game:
 
         # fov()
         self.fov_recompute = False
+        self.visible_tiles = tdl.map.quickFOV(
+            self.player.x,
+            self.player.y,
+            self.map.tile_is_visible,
+            fov=FOV_ALGO,
+            radius=TORCH_RADIUS,
+            lightWalls=FOV_LIGHT_WALL
+        )
 
 
     def loop(self):
@@ -179,12 +189,12 @@ class Game:
             self.input()
 
     def handle_input(self, event):
-        RECOMPUTE_LOS_ACTIONS = ["UP", "DOWN", "LEFT", "RIGHT"]
+        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
         # Movement keys
         if event.type == 'KEYDOWN':
             # print(event)
 
-            if event.key in RECOMPUTE_LOS_ACTIONS:
+            if event.key in RECOMPUTE_LOS_KEYS:
                 self.fov_recompute = True
 
             # player
@@ -227,6 +237,7 @@ class Game:
         elif event.type == 'MOUSEDOWN':
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
+                self.fov_recompute = True
                 logging.info("Cell: {}".format(event.cell))
 
         return None
