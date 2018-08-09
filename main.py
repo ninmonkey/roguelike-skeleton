@@ -197,7 +197,6 @@ class Game:
             lightWalls=FOV_LIGHT_WALL
         )
 
-
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
             self.update()
@@ -311,9 +310,9 @@ class Game:
                 (x, y) = event.cell
                 tile_id = self.map.at(x, y).tile_id
                 if tile_id == TileId.WALL:
-                    self.map.at(x, y).tile_id = TileId.FLOOR
+                    self.map.at(x, y).set_type(TileId.FLOOR)
                 else:
-                    self.map.at(x, y).tile_id = TileId.WALL
+                    self.map.at(x, y).set_type(TileId.WALL)
                 self.fov_recompute = True
 
         return None
