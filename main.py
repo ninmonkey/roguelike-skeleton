@@ -12,7 +12,7 @@ from app.render import (
     random_font_path,
 )
 
-from app.map import Map
+from app.map import Map, TileId
 
 # logger = logging.getLogger(__name__)
 logging.basicConfig(filename=os.path.join('logs','log.txt'), level=logging.DEBUG)
@@ -122,8 +122,24 @@ class Game:
         # map
         for y in range(self.TILES_Y):
             for x in range(self.TILES_X):
-                color = self.map.at(x, y).color
+                # color = self.map.at(x, y).color
+
+                tile_id = self.map.at(x, y).value
+                visible = True
+
+                if tile_id == TileId.WALL:
+                    if visible:
+                        color = colors.lit_dark_wall
+                    else:
+                        color = colors.dark_wall
+                elif tile_id == TileId.FLOOR:
+                    if visible:
+                        color = colors.lit_dark_floor
+                    else:
+                        color = colors.dark_floor
+
                 self.con.draw_char(x, y, None, fg=None, bg=color)
+
 
         render_entities(self.con, self.entities)
 

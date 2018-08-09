@@ -63,11 +63,11 @@ class Tile:
     def __init__(self, tile_id, blocking=False):
         self.blocking = blocking
         self.color = colors.white
-        self.value = 0
+        self.value = TileId.FLOOR
         self.set_type(tile_id)
 
     def set_type(self, tile_id):
-        self.value = tile_id.value
+        self.value = tile_id
         self.blocking = False
 
         if tile_id is TileId.FLOOR:
