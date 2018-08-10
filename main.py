@@ -27,7 +27,8 @@ TORCH_RADIUS = 10
 
 
 def random_percent(chance):
-    return randint(0, 100) <= chance
+    return randint(0, 100)
+    # return randint(0, 100) <= chance
 
 
 @unique
@@ -126,13 +127,17 @@ class Game:
             char = str(kwargs.get('char','X'))
             color = colors.yellow
 
-            if random_percent(70):
+            chance = random_percent(70)
+            if chance <= 30:
                 # orc
                 char = 'o'
                 color = colors.orc
-            else:
+            elif chance <= 60:
                 char = 'T'
                 color = colors.troll
+            else:
+                char = 'r'
+                color = colors.rat
 
             spawn = Entity(x, y, char, color, self)
             self.entities.append(spawn)
@@ -173,7 +178,6 @@ class Game:
                         color = colors.dark_floor
 
                 self.con.draw_char(x, y, None, fg=None, bg=color)
-
 
         render_entities(self.con, self.entities)
 

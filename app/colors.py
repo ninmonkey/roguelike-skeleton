@@ -32,6 +32,7 @@ dark_green = (60, 140, 60)
 desaturated_green = (63, 127, 63)
 darker_green = (0, 127, 0)
 light_amber = (255, 219, 114)
+sepia = (127, 101, 63)
 
 gray_0 = black
 gray_10 = gen_gray_percent(0.1, 255)
@@ -53,4 +54,4 @@ lit_dark_floor = gray_70
 
 orc = desaturated_green
 troll = light_amber
-
+rat = sepia
