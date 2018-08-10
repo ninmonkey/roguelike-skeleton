@@ -10,6 +10,7 @@ ROOM_MIN_SIZE = 3
 ROOMS_MAX = 20
 ROOMS_MAX_FAILURES = 20
 ROOMS_MAX_TIMEOUT_SECS = .6
+ROOMS_MAX_MONSTERS = 4
 
 @unique
 class TileId(Enum):
@@ -153,9 +154,11 @@ class Map:
                     'y': room.get_center()[1]})
                 continue
             else:
-                self.game.spawn('monster', **{
-                    'x': room.get_center()[0],
-                    'y': room.get_center()[1]})
+                monsters = randint(0, ROOMS_MAX_MONSTERS)
+                for _ in range(monsters):
+                    self.game.spawn('monster', **{
+                        'x': randint(room.x1, room.x2 - 1),
+                        'y': randint(room.y1, room.y2 - 1)})
 
             prev_room = rooms[counter-1]
             pos_prev = prev_room.get_center()
