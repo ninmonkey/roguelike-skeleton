@@ -1,7 +1,7 @@
 from enum import Enum, unique
 import logging
 import os
-import random
+from random import randint
 
 import tdl # import tcod as libtcod
 
@@ -24,6 +24,11 @@ PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
 TORCH_RADIUS = 10
+
+
+def random_percent(chance):
+    return randint(0, 100) <= chance
+
 
 @unique
 class InputMode(Enum):
@@ -119,7 +124,17 @@ class Game:
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
             char = str(kwargs.get('char','X'))
-            spawn = Entity(x, y, char, colors.yellow, self)
+            color = colors.yellow
+
+            if random_percent(70):
+                # orc
+                char = 'o'
+                color = colors.orc
+            else:
+                char = 'T'
+                color = colors.troll
+
+            spawn = Entity(x, y, char, color, self)
             self.entities.append(spawn)
         elif name == 'debug':
             x = kwargs.get('x', 0)
@@ -250,11 +265,12 @@ class Game:
                 logging.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
 
-            elif event.key == 'F1':
-                self.map.debug_show_colors = not self.map.debug_show_colors
-                self.init()
+            # elif event.key == 'F1':
+            #     self.map.debug_show_colors = not self.map.debug_show_colors
+            #     self.init()
             elif event.key == 'F2':
                 self.use_fog_of_war = not self.use_fog_of_war
+                print("Fog: {}".format(self.use_fog_of_war))
                 self.init()
             elif event.key == 'PAGEUP':
                 self.re_init_font()

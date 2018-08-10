@@ -14,7 +14,8 @@ code mostly based on http://rogueliketutorials.com/libtcod/
     - make key input based on state? 
 
 - separate screen_tiles_x from map_tiles_x for scrolling
-- text: player loc, monster count, fps. 
+- text: player loc, monster count, fps.
+- weightedChoice: https://gamedev.stackexchange.com/a/20929 
 
 # real-time vs turn-based
 
