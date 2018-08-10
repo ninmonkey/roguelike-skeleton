@@ -23,7 +23,6 @@ PATH_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
-USE_FOG_OF_WAR = False
 TORCH_RADIUS = 10
 
 @unique
@@ -71,6 +70,7 @@ class Game:
         self.fov_recompute = True
         self.visible_tiles = [] # todo: move to map
         self.input_mode = InputMode.GAME
+        self.use_fog_of_war = True
 
         self.init()
         path = os.path.join(PATH_APP_ROOT, 'fonts', 'arial12x12.png')
@@ -100,6 +100,7 @@ class Game:
         self.map.reset(self.TILES_X, self.TILES_Y)
         self.player = self.spawn("player")
         self.input_mode = InputMode.GAME
+        # self.use_fog_of_war = True
 
         self.map.gen_random_map()
 
@@ -139,7 +140,7 @@ class Game:
                 visible = (x, y) in self.visible_tiles
                 explored = self.map.at(x, y).explored
 
-                if not visible and not explored and USE_FOG_OF_WAR:
+                if not visible and not explored and self.use_fog_of_war:
                     continue
 
                 if visible and not explored:
@@ -252,6 +253,9 @@ class Game:
             elif event.key == 'F1':
                 self.map.debug_show_colors = not self.map.debug_show_colors
                 self.init()
+            elif event.key == 'F2':
+                self.use_fog_of_war = not self.use_fog_of_war
+                self.init()
             elif event.key == 'PAGEUP':
                 self.re_init_font()
             elif event.key == 'PAGEDOWN':
@@ -321,12 +325,12 @@ class Game:
 
 def main():
     g = Game()
+    print("""USE_FOG_OF_WAR = {}
+TORCH_RADIUS = {}""".format(g.use_fog_of_war, TORCH_RADIUS))
     g.loop()
 
 
 if __name__ == '__main__':
-    print("""USE_FOG_OF_WAR = {}
-TORCH_RADIUS = {}""".format(USE_FOG_OF_WAR, TORCH_RADIUS))
     main()
     print("To view hotkeys, see Game.handle_input")
     print('Done.')

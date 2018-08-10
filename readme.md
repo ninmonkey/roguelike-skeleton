@@ -4,9 +4,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- map is **MOT** fully blocking LOS by tile type.
-    tab then LMB to test.
-    and/or it is using the wrong algorithm?
+- when fog_of_war=False, explored tiles need to be darker.
 
 - switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
 - rotate logs:
