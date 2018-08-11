@@ -212,6 +212,10 @@ class Map:
         if self.at(x,y).blocking:
             return True
 
+        for entity in self.game.entities:
+            if entity.x == x and entity.y == y:
+                return True
+
         return False
 
     def in_bounds(self, x, y):

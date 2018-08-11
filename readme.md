@@ -4,8 +4,9 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
+- prevent monster spawns on top of each other.
+    either re-rand or attempt to nudge both away.
 - when fog_of_war=False, explored tiles need to be darker.
-
 - switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
 - rotate logs:
     https://docs.python.org/3.1/library/logging.html
