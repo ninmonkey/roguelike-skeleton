@@ -1,9 +1,9 @@
-from enum import Enum, unique
 import logging
 import os
+from enum import Enum, unique
 from random import randint
 
-import tdl # import tcod as libtcod
+import tdl  # import tcod as libtcod
 
 from app import colors
 from app.entity import Entity
@@ -14,7 +14,6 @@ from app.render import (
     render_entities,
     random_font_path,
 )
-
 
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True

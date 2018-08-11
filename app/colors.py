@@ -2,14 +2,17 @@ from random import randint
 
 # todo: rewrite as dict Or at least refactor to be internally-consistent
 
+
 def gen_gray_percent(fraction, base):
     r = int(fraction * base)
     g = int(fraction * base)
     b = int(fraction * base)
     return r, g, b
 
+
 def random_color():
     return randint(0, 255), randint(0, 255), randint(0, 255)
+
 
 def random_hue():
     raise NotImplementedError('wip HSL randomized color')
