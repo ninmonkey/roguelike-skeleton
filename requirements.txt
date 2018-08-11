@@ -1,0 +1,5 @@
+cffi==1.11.5
+libtcod-cffi==5.0.0
+numpy==1.14.5
+pycparser==2.18
+tdl==4.6.1
