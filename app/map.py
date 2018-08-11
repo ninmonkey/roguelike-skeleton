@@ -60,7 +60,12 @@ class Rect:
 
 
 class Tile:
-    # default to block both if block=True
+    """Tile used on each map coordinate
+
+    blocking -- blocks movement
+    blocks_vision -- can you see through it?
+    explored -- optional for fog of war
+    """
     def __init__(self, tile_id, blocking=False):
         self.blocking = blocking
         self.color = colors.white
@@ -88,6 +93,11 @@ class Tile:
 
 
 class Map:
+    """main map
+
+    tiles_x, tiles_y -- number of tiles
+    tiles -- Python 2d array for map
+    """
     def __init__(self, tiles_x, tiles_y, game):
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
@@ -105,6 +115,8 @@ class Map:
         self.tiles = [[Tile(tile_id) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
     def gen_random_map(self):
+        # entry point for dungeon generation
+
         self.reset(self.tiles_x, self.tiles_y, tile_id=TileId.WALL)
 
         rect_map = Rect(0, 0, self.tiles_x, self.tiles_y)
@@ -189,6 +201,19 @@ class Map:
             'x': r2.get_center()[0],
             'y': r2.get_center()[1]})
 
+    def is_blocked(self, x, y):
+        # default to failed bounds check
+        if x < 0 or x >= self.tiles_x:
+            return True
+
+        if y < 0 or y >= self.tiles_y:
+            return True
+
+        if self.at(x,y).blocking:
+            return True
+
+        return False
+
     def in_bounds(self, x, y):
         # is tile on map
         if any([x < 0,
@@ -206,7 +231,7 @@ class Map:
         if self.at(x, y).blocking:
             return False
 
-        # todo: LOS test
+        # todo: LOS test? not needed?
         # if self.at(x, y).blocks_vision:
         #     return False
 
@@ -252,19 +277,6 @@ class Map:
 
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.at(x, y).set_type(tile_id)
-
-    def is_blocked(self, x, y):
-        # default to failed bounds check
-        if x < 0 or x >= self.tiles_x:
-            return True
-
-        if y < 0 or y >= self.tiles_y:
-            return True
-
-        if self.at(x,y).blocking:
-            return True
-
-        return False
 
     def __str__(self):
         return "Map({}, {})".format(self.tiles_x, self.tiles_y)

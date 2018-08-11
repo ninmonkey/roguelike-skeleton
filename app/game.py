@@ -7,14 +7,13 @@ import tdl # import tcod as libtcod
 
 from app import colors
 from app.entity import Entity
+from app.map import Map, TileId
 from app.render import (
     render_blit,
     render_clear_all,
     render_entities,
     random_font_path,
 )
-
-from app.map import Map, TileId
 
 
 FOV_ALGO = 'BASIC'
@@ -34,14 +33,22 @@ class InputMode(Enum):
 
 class Game:
     """
-        see `init()`, definitions are not duplicated between it and `__init__()`
+    note: see `init()`, definitions are not duplicated between it and `__init__()`
+
+    methods:
+        spawn -- ['player'|'monster'|'item'] factory constructor
+
     members:
-        root_console: main screen surface
-        con: 2nd surface, back-buffer to render to root_console
+        root_console --  main screen surface
+        con -- 2nd surface, back-buffer to render to root_console
+        map -- actual Map instance
+        entities -- list of `Entity()s`
+        is_done -- causes game to exit
 
     """
     def __init__(self, root_path):
         self.root_path = root_path
+        self.limit_fps = 60
         self.is_done = False
         self.TILES_X = 80
         self.TILES_Y = 50
@@ -49,12 +56,12 @@ class Game:
         self.player = None
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.map.debug_show_colors = True
+        self.input_mode = InputMode.GAME
+
         self.fov_recompute = True
         self.visible_tiles = [] # todo: move to map
-        self.input_mode = InputMode.GAME
         self.use_fog_of_war = True
         self.torch_radius = 10
-        self.limit_fps = 60
 
         self.init()
         path = os.path.join(self.root_path, 'fonts', 'arial12x12.png')
