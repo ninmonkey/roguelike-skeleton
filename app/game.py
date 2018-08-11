@@ -100,38 +100,48 @@ class Game:
         if name == 'player':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
-            spawn = Entity(x, y, '@', colors.white, self)
+
+            spawn = Entity(x, y, '@', colors.white, self, name="Player", blocking=True)
             if self.player and self.player in self.entities:
                 self.entities.remove(self.player)
 
             self.entities.append(spawn)
             self.player = spawn
+
+            logging.debug("Spawn('player') = {}".format(str(spawn)))
             return spawn
         elif name == 'monster':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
             # char = str(kwargs.get('char','X'))
             color = colors.yellow
+            name = "Nobody"
 
             chance = random_percent(70)
             if chance <= 30:
                 # orc
                 char = 'o'
                 color = colors.orc
+                name = 'Orc'
             elif chance <= 60:
                 char = 'T'
                 color = colors.troll
+                name = 'Troll'
             else:
                 char = 'r'
                 color = colors.rat
+                name = 'Rat'
 
-            spawn = Entity(x, y, char, color, self)
+            spawn = Entity(x, y, char, color, self, name=name, blocking=True)
+            logging.debug("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
         elif name == 'debug':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
             char = str(kwargs.get('char','X'))
             spawn = Entity(x, y, char, colors.black, self)
+
+            logging.debug("Spawn('debug') {}".format(str(spawn)))
             self.entities.append(spawn)
         else:
             raise ValueError("Unknown spawn type: {}".format(name))
