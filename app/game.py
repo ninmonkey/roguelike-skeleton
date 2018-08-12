@@ -218,6 +218,16 @@ class Game:
             lightWalls=FOV_LIGHT_WALL
         )
 
+        self.loop_ai()
+
+    def loop_ai(self):
+        for entity in self.entities:
+            if entity == self.player:
+                continue
+
+            x, y = randint(-1, 1), randint(-1, 1)
+            entity.move(x, y)
+
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
             self.update()
