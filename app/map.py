@@ -202,18 +202,15 @@ class Map:
             'y': r2.get_center()[1]})
 
     def is_blocked(self, x, y):
-        # default to failed bounds check
-        if x < 0 or x >= self.tiles_x:
+        # blocked by tile or entity
+        if not self.in_bounds(x, y):
             return True
 
-        if y < 0 or y >= self.tiles_y:
-            return True
-
-        if self.at(x,y).blocking:
+        if self.at(x, y).blocking:
             return True
 
         for entity in self.game.entities:
-            if entity.x == x and entity.y == y:
+            if entity.blocking and entity.x == x and entity.y == y:
                 return True
 
         return False

@@ -12,6 +12,7 @@ from app.render import (
     render_blit,
     render_clear_all,
     render_entities,
+    render_entity,
     random_font_path,
 )
 
@@ -174,7 +175,12 @@ class Game:
 
                 self.con.draw_char(x, y, None, fg=None, bg=color)
 
+        # entities
         render_entities(self.con, self.entities)
+
+        # this does draw player a 2nd time but then I don't have to worry about
+        # entity order (to always be on top)
+        render_entity(self.con, self.player)
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
