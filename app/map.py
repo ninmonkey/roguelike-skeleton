@@ -1,9 +1,17 @@
 import logging
+import os
 import time
 from enum import Enum, unique
 from random import randint
 
 from app import colors
+
+logger_map = logging.getLogger(__name__)
+# logger_map.setLevel(logging.DEBUG)
+# logging.basicConfig(
+#     handlers=[logging.FileHandler(os.path.join('logs', 'map.txt'), 'w', 'utf-8')],
+#     level=logging.DEBUG)
+
 
 ROOM_MAX_SIZE = 9
 ROOM_MIN_SIZE = 3
@@ -131,7 +139,7 @@ class Map:
                 w=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
                 h=randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE),
             )
-            logging.info("Room [{}] = {}".format(room_id, room))
+            logger_map.info("Room [{}] = {}".format(room_id, room))
 
             if not room.in_rect(rect_map):
                 continue
@@ -140,8 +148,8 @@ class Map:
             for other in rooms:
                 if room.intersect(other, padding=self.room_gen_padding):
                     valid_room = False
-                    logging.debug("\tcollide: \t{}".format(other))
-                    logging.debug("\tself: \t\t{}".format(room))
+                    logger_map.debug("\tcollide: \t{}".format(other))
+                    logger_map.debug("\tself: \t\t{}".format(room))
                     break
 
             if valid_room:
@@ -183,7 +191,7 @@ class Map:
                 self.create_tunnel_vertical(pos_prev[1], pos_room[1], pos_prev[0])
                 self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_room[1])
 
-        logging.info("Rooms used: {}".format(len(rooms)))
+        logger_map.info("Rooms used: {}".format(len(rooms)))
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -252,7 +260,7 @@ class Map:
         # [x1, x2), [y1, y2)
         if any([rect.x1 > rect.x2,
                 rect.y1 > rect.y2]):
-            logging.warning("Bad create_room() args: {}".format(rect))
+            logger_map.warning("Bad create_room() args: {}".format(rect))
             return
 
         end_x = min(rect.x2, self.tiles_x)

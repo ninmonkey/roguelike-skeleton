@@ -12,10 +12,13 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 # todo:
 
 - when fog_of_war=False, explored tiles need to be darker.
-- switch to logging (redirect to console) https://docs.python.org/3/howto/logging.html#configuring-logging 
-- rotate logs:
-    https://docs.python.org/3.1/library/logging.html
+- switch to logging (redirect to console)
+    - https://docs.python.org/3/howto/logging.html#configuring-logging 
+    - rotate logs:
+        https://pymotw.com/3/logging/
+        https://docs.python.org/3.1/library/logging.html
     
+- make space 'rest'
 - todo: disable input event auto-repeat
     - make key input based on state? 
 

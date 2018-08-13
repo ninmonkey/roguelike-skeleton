@@ -5,7 +5,9 @@ from app.common import get_full_path
 from app.game import Game
 
 # logger = logging.getLogger(__name__)
-logging.basicConfig(filename=os.path.join('logs','log.txt'), level=logging.DEBUG)
+logging.basicConfig(
+    handlers=[logging.FileHandler(os.path.join('logs', 'log.txt'), 'w', 'utf-8')],
+    level=logging.DEBUG)
 
 
 def main():

@@ -16,6 +16,9 @@ from app.render import (
     random_font_path,
 )
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
 
@@ -69,12 +72,12 @@ class Game:
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
         tdl.setFPS(self.limit_fps)
-        logging.debug("FPS: {}".format(self.limit_fps))
+        logger.debug("FPS: {}".format(self.limit_fps))
 
     def re_init_font(self):
         # allows reloading of font
         path = random_font_path(PATH_APP_ROOT)
-        logging.info("font: ", path)
+        logger.debug("font: ", path)
         tdl.set_font(path, greyscale=True, altLayout=True)
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
@@ -101,15 +104,17 @@ class Game:
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
 
-            spawn = Entity(x, y, '@', colors.white, self, entity_id=EntityId.PLAYER,
-                           can_hurt_monsters=True, name="Player", blocking=True)
+            spawn = Entity(
+                x, y, '@', colors.white, self, entity_id=EntityId.PLAYER,
+                can_hurt_monsters=True, name="Player", blocking=True)
+
             if self.player and self.player in self.entities:
                 self.entities.remove(self.player)
 
             self.entities.append(spawn)
             self.player = spawn
 
-            logging.debug("Spawn('player') = {}".format(str(spawn)))
+            logger.debug("Spawn('player') = {}".format(str(spawn)))
             return spawn
         elif name == 'monster':
             x = kwargs.get('x', 0)
@@ -133,8 +138,11 @@ class Game:
                 color = colors.rat
                 name = 'Rat'
 
-            spawn = Entity(x, y, char, color, self, entity_id=EntityId.MONSTER, name=name, blocking=True)
-            logging.debug("Spawn('monster') = {}".format(str(spawn)))
+            spawn = Entity(
+                x, y, char, color, self, entity_id=EntityId.MONSTER,
+                name=name, blocking=True)
+
+            logger.info("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
 
         elif name == 'debug':
@@ -144,7 +152,7 @@ class Game:
             spawn = Entity(x, y, char, colors.black, self, entity_id=EntityId.DEBUG,
                     name=char, blocking=False)
 
-            logging.debug("Spawn('debug') {}".format(str(spawn)))
+            logger.info("Spawn('debug') {}".format(str(spawn)))
             self.entities.append(spawn)
         else:
             raise ValueError("Unknown spawn type: {}".format(name))
@@ -242,7 +250,7 @@ class Game:
                 if action.get('move'):
                     self.player.move_or_attack(*action.get('move'))
 
-                if action.get('rest'):
+                if action.get('rest'):  
                     raise NotImplementedError("Is not updating even if I call 'update()'")
                 if action.get('exit'):
                     self.is_done = True
@@ -289,11 +297,11 @@ class Game:
             elif event.key == '1':
                 self.map.room_gen_padding -= 1
                 self.map.room_gen_padding = max(self.map.room_gen_padding, 0)
-                logging.info("room padding: {}".format(self.map.room_gen_padding))
+                logger.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
             elif event.key == '2':
                 self.map.room_gen_padding += 1
-                logging.info("room padding: {}".format(self.map.room_gen_padding))
+                logger.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
 
             # elif event.key == 'F1':
@@ -320,7 +328,7 @@ class Game:
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
                 self.fov_recompute = True
-                logging.info("Cell: {}".format(event.cell))
+                logger.info("Cell: {}".format(event.cell))
 
         return None
 
