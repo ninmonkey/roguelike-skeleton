@@ -53,16 +53,10 @@ class Entity:
             if self == monster:
                 continue
 
-            self.attack_entity(monster)
+            if not self.can_hurt_monsters:
+                continue
 
-            # print("{}, {}".format(self.entity_id, monster.entity_id))
-            # if self.entity_id == EntityId.MONSTER and monster.entity_id == EntityId.MONSTER:
-            #     # print("Can hurt? {}, {}".format(self.can_hurt_monsters, monster.can_hurt_monsters))
-            #     if not self.can_hurt_monsters:
-            #         continue
-            #     self.attack_entity(monster)
-            # else:
-            #     self.attack_entity(monster)
+            self.attack_entity(monster)
 
     def attack_entity(self, other):
         print("{name} attacks {other} HP {hp} - {damage}".format(

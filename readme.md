@@ -18,7 +18,11 @@ code mostly based on http://rogueliketutorials.com/libtcod/
     in combat tests. specifically:
         
         def move_or_attack()
-            monsters = self.game.get_monsters_at(new_x, new_y) 
+            monsters = self.game.get_monsters_at(new_x, new_y)
+            
+        - if player has can_hurt_monsters=False
+            - it *does* prevent attacks
+            - but monster on monster still occurs 
 
 # todo:
 

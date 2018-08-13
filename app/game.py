@@ -143,7 +143,7 @@ class Game:
 
             spawn = Entity(
                 x, y, char, color, self, entity_id=EntityId.MONSTER,
-                can_hurt_monsters=True,
+                can_hurt_monsters=False,
                 hp=hp,
                 name=name, blocking=True)
 
