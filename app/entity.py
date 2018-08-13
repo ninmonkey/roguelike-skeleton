@@ -16,9 +16,11 @@ class Entity:
     blocking -- is walking on this blocked?
     can_hurt_monsters -- enables monster friendly fire
     """
-    def __init__(self, x, y, char, color, game, entity_id, can_hurt_monsters=False, name=None, blocking=True):
+    def __init__(self, x, y, char, color, game, entity_id, damage=1, hp=1, can_hurt_monsters=False, name=None, blocking=True):
         self.x = x
         self.y = y
+        self.hp = hp
+        self.damage = damage
         self.char = char
         self.color = color
         self.game = game
@@ -55,20 +57,28 @@ class Entity:
             if self == monster:
                 continue
 
-            if not self.can_hurt_monsters:
-                continue
+            if self.entity_id == EntityId.MONSTER and monster.entity_id == EntityId.MONSTER:
+                if not self.can_hurt_monsters:
+                    continue
 
-            # print("{name} attacks {monster} -- stack={stack}".format(
-            #     name=self.name,
-            #     monster=monster.name,
-            #     stack=len(monsters)))
+                print("{name} attacks {monster} -- stack={stack}".format(
+                    name=self.name,
+                    monster=monster.name,
+                    stack=len(monsters)))
+
+            # if not self.can_hurt_monsters:
+            #     continue
 
             self.attack_entity(monster)
 
     def attack_entity(self, other):
-        print("{name} attacks {other}".format(
+        print("{name} attacks {other} HP {hp} - {damage}".format(
             name=self.name,
-            other=other.name))
+            other=other.name,
+            hp=other.hp,
+            damage=self.damage,
+        ))
+        other.hp -= self.damage
 
     def teleport_to(self, x, y):
         if self.map.in_bounds(x, y):

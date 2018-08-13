@@ -7,16 +7,22 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 - prevent monster spawns on top of each other.
     either re-rand or attempt to nudge both away.
     
- - get_monsters_only() use EntityId == Monster 
+ - get_monsters_only() use EntityId == Monster
+ - monster friendly fire damage not preventing kills
+ 
+ - edit events to be turn-based
+    - pull loop_ai() outside recompute 
 
 # todo:
 
+- render HP values
 - when fog_of_war=False, explored tiles need to be darker.
 - switch to logging (redirect to console)
     - https://docs.python.org/3/howto/logging.html#configuring-logging 
     - rotate logs:
         https://pymotw.com/3/logging/
         https://docs.python.org/3.1/library/logging.html
+    - separate log file for Map
     
 - make space 'rest'
 - todo: disable input event auto-repeat

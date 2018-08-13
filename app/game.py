@@ -106,6 +106,7 @@ class Game:
 
             spawn = Entity(
                 x, y, '@', colors.white, self, entity_id=EntityId.PLAYER,
+                hp=5,
                 can_hurt_monsters=True, name="Player", blocking=True)
 
             if self.player and self.player in self.entities:
@@ -119,6 +120,7 @@ class Game:
         elif name == 'monster':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
+            hp = kwargs.get('hp', 1)
             # char = str(kwargs.get('char','X'))
             color = colors.yellow
             name = "Nobody"
@@ -133,6 +135,7 @@ class Game:
                 char = 'T'
                 color = colors.troll
                 name = 'Troll'
+                hp = 2
             else:
                 char = 'r'
                 color = colors.rat
@@ -140,6 +143,8 @@ class Game:
 
             spawn = Entity(
                 x, y, char, color, self, entity_id=EntityId.MONSTER,
+                can_hurt_monsters=False,
+                hp=hp,
                 name=name, blocking=True)
 
             logger.info("Spawn('monster') = {}".format(str(spawn)))
@@ -150,7 +155,8 @@ class Game:
             y = kwargs.get('y', 0)
             char = str(kwargs.get('char','X'))
             spawn = Entity(x, y, char, colors.black, self, entity_id=EntityId.DEBUG,
-                    name=char, blocking=False)
+                           can_hurt_monsters=False,
+                           name=char, blocking=False)
 
             logger.info("Spawn('debug') {}".format(str(spawn)))
             self.entities.append(spawn)
@@ -201,21 +207,20 @@ class Game:
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
     def update(self):
-        if not self.fov_recompute:
-            return
 
-        # fov()
-        self.fov_recompute = False
-        self.visible_tiles = tdl.map.quickFOV(
-            self.player.x,
-            self.player.y,
-            self.map.tile_is_visible,
-            fov=FOV_ALGO,
-            radius=self.torch_radius,
-            lightWalls=FOV_LIGHT_WALL
-        )
+        if self.fov_recompute:
+            self.loop_ai()
+            # fov()
+            self.fov_recompute = False
+            self.visible_tiles = tdl.map.quickFOV(
+                self.player.x,
+                self.player.y,
+                self.map.tile_is_visible,
+                fov=FOV_ALGO,
+                radius=self.torch_radius,
+                lightWalls=FOV_LIGHT_WALL
+            )
 
-        self.loop_ai()
 
     def get_monsters_only(self):
         # use map and filter based on Enum
@@ -232,9 +237,16 @@ class Game:
         return monsters
 
     def loop_ai(self):
+        for monster in list(self.get_monsters_only()):
+            if monster.hp <= 0:
+                self.entities.remove(monster)
+                print("{} dies".format(monster.name))
+
         for monster in self.get_monsters_only():
             x, y = randint(-1, 1), randint(-1, 1)
             monster.move_or_attack(x, y)
+
+        print("Monsters: {}".format(len(self.get_monsters_only())))
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
@@ -250,8 +262,8 @@ class Game:
                 if action.get('move'):
                     self.player.move_or_attack(*action.get('move'))
 
-                if action.get('rest'):  
-                    raise NotImplementedError("Is not updating even if I call 'update()'")
+                if action.get('rest'):
+                    pass
                 if action.get('exit'):
                     self.is_done = True
 
@@ -268,7 +280,7 @@ class Game:
             raise Exception("Unknown game mode: {}".format(self.input_mode))
 
     def handle_input_game(self, event):
-        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
+        RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT", "SPACE"]
 
         if event.type == 'KEYDOWN':
             # print(event)
