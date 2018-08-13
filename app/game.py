@@ -62,6 +62,7 @@ class Game:
         self.input_mode = InputMode.GAME
 
         self.fov_recompute = True
+        self.update_sim = True
         self.visible_tiles = [] # todo: move to map
         self.use_fog_of_war = True
         self.torch_radius = 10
@@ -86,6 +87,7 @@ class Game:
     def init(self):
         # reset for next round, and first-time init.
         self.fov_recompute = True
+        self.update_sim = True
         self.visible_tiles = []  # todo: move to map
         self.is_done = False
         self.TILES_X = 80
@@ -218,8 +220,10 @@ class Game:
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
     def update(self):
-
-        self.loop_ai()
+        if self.update_sim:
+            self.loop_ai()
+            self.update_sim = False
+            print('. ')
 
         if self.fov_recompute:
             # fov()
@@ -264,20 +268,20 @@ class Game:
             self.input()
 
     def input(self):
-        # for event in tdl.event.get():
-        event = tdl.event.key_wait()
-        action = self.handle_input(event)
+        for event in tdl.event.get():
+            # event = tdl.event.key_wait()
+            action = self.handle_input(event)
 
-        if action:
-            if action.get('move'):
-                self.player.move_or_attack(*action.get('move'))
-            if action.get('rest'):
-                pass
-            if action.get('exit'):
-                self.is_done = True
+            if action:
+                if action.get('move'):
+                    self.player.move_or_attack(*action.get('move'))
+                if action.get('rest'):
+                    self.update_sim = True
+                if action.get('exit'):
+                    self.is_done = True
 
-            if action.get('fullscreen'):
-                tdl.set_fullscreen(not tdl.get_fullscreen())
+                if action.get('fullscreen'):
+                    tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def handle_input(self, event):
         # Movement keys
@@ -290,12 +294,19 @@ class Game:
 
     def handle_input_game(self, event):
         RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT", "SPACE"]
+        UPDATE_SIM_KEYS = RECOMPUTE_LOS_KEYS
+        self.update_sim = False
 
         if event.type == 'KEYDOWN':
             # print(event)
 
             if event.key in RECOMPUTE_LOS_KEYS:
                 self.fov_recompute = True
+
+            if event.key in UPDATE_SIM_KEYS:
+                self.update_sim = True
+            else:
+                self.update_sim = False
 
             # player
             if event.key == 'UP':
