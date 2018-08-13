@@ -209,6 +209,7 @@ class Map:
         if self.at(x, y).blocking:
             return True
 
+        # actually *do* want to include player here
         for entity in self.game.entities:
             if entity.blocking and entity.x == x and entity.y == y:
                 return True

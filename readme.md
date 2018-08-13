@@ -6,6 +6,8 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 - prevent monster spawns on top of each other.
     either re-rand or attempt to nudge both away.
+    
+ - get_monsters_only() use EntityId == Monster 
 
 # todo:
 

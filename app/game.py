@@ -6,7 +6,7 @@ from random import randint
 import tdl  # import tcod as libtcod
 
 from app import colors
-from app.entity import Entity
+from app.entity import Entity, EntityId
 from app.map import Map, TileId
 from app.render import (
     render_blit,
@@ -101,7 +101,8 @@ class Game:
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
 
-            spawn = Entity(x, y, '@', colors.white, self, name="Player", blocking=True)
+            spawn = Entity(x, y, '@', colors.white, self, entity_id=EntityId.PLAYER,
+                           can_hurt_monsters=True, name="Player", blocking=True)
             if self.player and self.player in self.entities:
                 self.entities.remove(self.player)
 
@@ -132,14 +133,16 @@ class Game:
                 color = colors.rat
                 name = 'Rat'
 
-            spawn = Entity(x, y, char, color, self, name=name, blocking=True)
+            spawn = Entity(x, y, char, color, self, entity_id=EntityId.MONSTER, name=name, blocking=True)
             logging.debug("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
+
         elif name == 'debug':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
             char = str(kwargs.get('char','X'))
-            spawn = Entity(x, y, char, colors.black, self)
+            spawn = Entity(x, y, char, colors.black, self, entity_id=EntityId.DEBUG,
+                    name=char, blocking=False)
 
             logging.debug("Spawn('debug') {}".format(str(spawn)))
             self.entities.append(spawn)
@@ -189,20 +192,6 @@ class Game:
         tdl.flush()
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
-    def input(self):
-        for event in tdl.event.get():
-            action = self.handle_input(event)
-
-            if action:
-                if action.get('move'):
-                    self.player.move(*action.get('move'))
-
-                if action.get('exit'):
-                    self.is_done = True
-
-                if action.get('fullscreen'):
-                    tdl.set_fullscreen(not tdl.get_fullscreen())
-
     def update(self):
         if not self.fov_recompute:
             return
@@ -220,19 +209,46 @@ class Game:
 
         self.loop_ai()
 
-    def loop_ai(self):
-        for entity in self.entities:
-            if entity == self.player:
-                continue
+    def get_monsters_only(self):
+        # use map and filter based on Enum
+        e = self.entities[:]
+        e.remove(self.player)
+        return e
 
+    def get_monsters_at(self, x, y):
+        monsters = []
+        for monster in self.get_monsters_only():
+            if monster.x == x and monster.y == y:
+                monsters.append(monster)
+
+        return monsters
+
+    def loop_ai(self):
+        for monster in self.get_monsters_only():
             x, y = randint(-1, 1), randint(-1, 1)
-            entity.move(x, y)
+            monster.move_or_attack(x, y)
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
             self.update()
             self.draw()
             self.input()
+
+    def input(self):
+        for event in tdl.event.get():
+            action = self.handle_input(event)
+
+            if action:
+                if action.get('move'):
+                    self.player.move_or_attack(*action.get('move'))
+
+                if action.get('rest'):
+                    raise NotImplementedError("Is not updating even if I call 'update()'")
+                if action.get('exit'):
+                    self.is_done = True
+
+                if action.get('fullscreen'):
+                    tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def handle_input(self, event):
         # Movement keys
@@ -293,7 +309,7 @@ class Game:
                 self.re_init_font()
 
             elif event.key == 'SPACE':
-                self.init()
+                return {'rest': True}
             elif event.key == 'ESCAPE':
                 return {'exit': True}
             elif event.key == 'ENTER' and event.alt:
@@ -335,7 +351,7 @@ class Game:
                 return {'move': (1, 0)}
 
             elif event.key == 'SPACE':
-                self.init()
+                return {'rest': True}
             elif event.key == 'ESCAPE':
                 return {'exit': True}
 
