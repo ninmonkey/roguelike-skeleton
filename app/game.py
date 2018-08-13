@@ -219,8 +219,9 @@ class Game:
 
     def update(self):
 
+        self.loop_ai()
+
         if self.fov_recompute:
-            self.loop_ai()
             # fov()
             self.fov_recompute = False
             self.visible_tiles = tdl.map.quickFOV(
@@ -231,7 +232,6 @@ class Game:
                 radius=self.torch_radius,
                 lightWalls=FOV_LIGHT_WALL
             )
-
 
     def get_monsters_only(self):
         # use map and filter based on Enum
@@ -264,20 +264,20 @@ class Game:
             self.input()
 
     def input(self):
-        for event in tdl.event.get():
-            action = self.handle_input(event)
+        # for event in tdl.event.get():
+        event = tdl.event.key_wait()
+        action = self.handle_input(event)
 
-            if action:
-                if action.get('move'):
-                    self.player.move_or_attack(*action.get('move'))
+        if action:
+            if action.get('move'):
+                self.player.move_or_attack(*action.get('move'))
+            if action.get('rest'):
+                pass
+            if action.get('exit'):
+                self.is_done = True
 
-                if action.get('rest'):
-                    pass
-                if action.get('exit'):
-                    self.is_done = True
-
-                if action.get('fullscreen'):
-                    tdl.set_fullscreen(not tdl.get_fullscreen())
+            if action.get('fullscreen'):
+                tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def handle_input(self, event):
         # Movement keys
