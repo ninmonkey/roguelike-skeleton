@@ -279,13 +279,15 @@ class Game:
                     self.update_sim = True
                 if action.get('exit'):
                     self.is_done = True
-
+                if action.get('open'):
+                    print("Example of a command that does **not** update simulation")
                 if action.get('fullscreen'):
                     tdl.set_fullscreen(not tdl.get_fullscreen())
 
     def handle_input(self, event):
         # Movement keys
         if self.input_mode == InputMode.GAME:
+            print(event)
             return self.handle_input_game(event)
         elif self.input_mode == InputMode.EDITOR:
             return self.handle_input_editor(event)
@@ -295,7 +297,6 @@ class Game:
     def handle_input_game(self, event):
         RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT", "SPACE"]
         UPDATE_SIM_KEYS = RECOMPUTE_LOS_KEYS
-        self.update_sim = False
 
         if event.type == 'KEYDOWN':
             # print(event)
@@ -305,8 +306,6 @@ class Game:
 
             if event.key in UPDATE_SIM_KEYS:
                 self.update_sim = True
-            else:
-                self.update_sim = False
 
             # player
             if event.key == 'UP':
@@ -317,6 +316,11 @@ class Game:
                 return {'move': (-1, 0)}
             elif event.key == 'RIGHT':
                 return {'move': (1, 0)}
+            #elif event.key == 'TEXT':
+            elif event.key == 'CHAR':
+                raise NotImplementedError("Key of name 'i' isn't firing")
+                if event.key.text == 'i':
+                    return {'open': 'inventory'}
 
             # debug / map / etc
             elif event.key == 'TAB':
@@ -362,7 +366,7 @@ class Game:
                 self.fov_recompute = True
                 logger.info("Cell: {}".format(event.cell))
 
-        return None
+        return {}
 
     def handle_input_editor(self, event):
         RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]
@@ -406,4 +410,4 @@ class Game:
                     self.map.at(x, y).set_type(TileId.WALL)
                 self.fov_recompute = True
 
-        return None
+        return {}
