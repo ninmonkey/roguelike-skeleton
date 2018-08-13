@@ -104,10 +104,14 @@ class Game:
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
 
-            spawn = Entity(
-                x, y, '@', colors.white, self, entity_id=EntityId.PLAYER,
-                hp=5,
-                can_hurt_monsters=True, name="Player", blocking=True)
+            kwargs = {
+                'entity_id': EntityId.PLAYER,
+                'hp': 5,
+                'can_hurt_monsters': True,
+                'name': "Player",
+                'blocking': True
+            }
+            spawn = Entity(x, y, '@', colors.white, self, **kwargs)
 
             if self.player and self.player in self.entities:
                 self.entities.remove(self.player)
@@ -141,22 +145,29 @@ class Game:
                 color = colors.rat
                 name = 'Rat'
 
-            spawn = Entity(
-                x, y, char, color, self, entity_id=EntityId.MONSTER,
-                can_hurt_monsters=False,
-                hp=hp,
-                name=name, blocking=True)
+            kwargs = {
+                'entity_id': EntityId.MONSTER,
+                'hp': hp,
+                'can_hurt_monsters': False,
+                'name': name,
+                'blocking': True
+            }
+            spawn = Entity(x, y, char, color, self, **kwargs)
 
             logger.info("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
-
         elif name == 'debug':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
             char = str(kwargs.get('char','X'))
-            spawn = Entity(x, y, char, colors.black, self, entity_id=EntityId.DEBUG,
-                           can_hurt_monsters=False,
-                           name=char, blocking=False)
+
+            kwargs = {
+                'entity_id': EntityId.DEBUG,
+                'can_hurt_monsters': False,
+                'name': char,
+                'blocking': False
+            }
+            spawn = Entity(x, y, char, colors.black, self, **kwargs)
 
             logger.info("Spawn('debug') {}".format(str(spawn)))
             self.entities.append(spawn)
@@ -245,8 +256,6 @@ class Game:
         for monster in self.get_monsters_only():
             x, y = randint(-1, 1), randint(-1, 1)
             monster.move_or_attack(x, y)
-
-        print("Monsters: {}".format(len(self.get_monsters_only())))
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():

@@ -6,13 +6,13 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 - prevent monster spawns on top of each other.
     either re-rand or attempt to nudge both away.
-    
- - get_monsters_only() use EntityId == Monster
- - monster friendly fire damage not preventing kills
- 
- - edit events to be turn-based
+     
+ - **edit events** to be turn-based
     - pull loop_ai() outside recompute 
 
+# text
+    - render monster count
+    - render HP values of monsters
 # bugs:
     - attack_or move currently doesn't iterate with player
     in combat tests. specifically:
@@ -26,7 +26,6 @@ code mostly based on http://rogueliketutorials.com/libtcod/
 
 # todo:
 
-- render HP values
 - when fog_of_war=False, explored tiles need to be darker.
 - switch to logging (redirect to console)
     - https://docs.python.org/3/howto/logging.html#configuring-logging 
@@ -35,7 +34,6 @@ code mostly based on http://rogueliketutorials.com/libtcod/
         https://docs.python.org/3.1/library/logging.html
     - separate log file for Map
     
-- make space 'rest'
 - todo: disable input event auto-repeat
     - make key input based on state? 
 
