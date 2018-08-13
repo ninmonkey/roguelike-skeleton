@@ -42,10 +42,6 @@ class Entity:
         new_y = self.y + dy
         logging.info("{} .move(dx={}, dy={})".format(self, dx, dy))
 
-        # blocking entity at target?
-        # for i, monster in enumerate(self.game.get_monsters_only()):
-        #     print(i, monster)
-
         monsters = self.game.get_monsters_at(new_x, new_y)
 
         if not monsters:
@@ -57,19 +53,16 @@ class Entity:
             if self == monster:
                 continue
 
-            if self.entity_id == EntityId.MONSTER and monster.entity_id == EntityId.MONSTER:
-                if not self.can_hurt_monsters:
-                    continue
-
-                print("{name} attacks {monster} -- stack={stack}".format(
-                    name=self.name,
-                    monster=monster.name,
-                    stack=len(monsters)))
-
-            # if not self.can_hurt_monsters:
-            #     continue
-
             self.attack_entity(monster)
+
+            # print("{}, {}".format(self.entity_id, monster.entity_id))
+            # if self.entity_id == EntityId.MONSTER and monster.entity_id == EntityId.MONSTER:
+            #     # print("Can hurt? {}, {}".format(self.can_hurt_monsters, monster.can_hurt_monsters))
+            #     if not self.can_hurt_monsters:
+            #         continue
+            #     self.attack_entity(monster)
+            # else:
+            #     self.attack_entity(monster)
 
     def attack_entity(self, other):
         print("{name} attacks {other} HP {hp} - {damage}".format(
