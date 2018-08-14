@@ -99,6 +99,14 @@ class Tile:
         else:
             raise ValueError("Unknown tile type: {}".format(tile_id))
 
+    def __str__(self):
+        return "Tile<(id={id}, block={block}, vision={vision}, color={color})>".format(
+            id=self.tile_id,
+            block=self.blocking,
+            vision=self.blocks_vision,
+            color=self.color
+        )
+
 
 class Map:
     """main map
@@ -240,10 +248,6 @@ class Map:
 
         if self.at(x, y).blocking:
             return False
-
-        # todo: LOS test? not needed?
-        # if self.at(x, y).blocks_vision:
-        #     return False
 
         return True
 

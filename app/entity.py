@@ -73,7 +73,8 @@ class Entity:
             self.y = y
 
     def __str__(self):
-        return "Entity(type={char} name={name}, pos=({x}, {y}))".format(
+        return "Entity(id={id}, type={char} name={name}, pos=({x}, {y}))".format(
+            id=self.entity_id,
             char=self.char,
             name=self.name,
             x=self.x,

@@ -287,7 +287,6 @@ class Game:
     def handle_input(self, event):
         # Movement keys
         if self.input_mode == InputMode.GAME:
-            print(event)
             return self.handle_input_game(event)
         elif self.input_mode == InputMode.EDITOR:
             return self.handle_input_editor(event)
