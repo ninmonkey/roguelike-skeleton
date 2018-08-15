@@ -10,6 +10,25 @@ class EntityId(Enum):
     DEBUG = 9999
 
 
+def move_towards(entity, other):
+    x, y = 0, 0
+    if entity.x < other.x:
+        x = 1
+    elif entity.x > other.x:
+        x = -1
+    else:
+        x = 0
+
+    if entity.y < other.y:
+        y = 1
+    elif entity.y > other.y:
+        y = -1
+    else:
+        y = 0
+
+    return x, y
+
+
 class Entity:
     """Base class for game units/monsters/player
 

@@ -6,7 +6,11 @@ from random import randint
 import tdl  # import tcod as libtcod
 
 from app import colors
-from app.entity import Entity, EntityId
+from app.entity import (
+    Entity,
+    EntityId,
+    move_towards,
+)
 from app.map import Map, TileId
 from app.render import (
     render_blit,
@@ -23,34 +27,14 @@ FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
 
 
-def random_percent(chance):
+def random_percent():
     return randint(0, 100)
-    # return randint(0, 100) <= chance
 
 
 @unique
 class InputMode(Enum):
     GAME = 0
     EDITOR = 1
-
-
-def move_towards(entity, other):
-    x, y = 0, 0
-    if entity.x < other.x:
-        x = 1
-    elif entity.x > other.x:
-        x = -1
-    else:
-        x = 0
-
-    if entity.y < other.y:
-        y = 1
-    elif entity.y > other.y:
-        y = -1
-    else:
-        y = 0
-
-    return x, y
 
 
 class Game:
@@ -127,7 +111,7 @@ class Game:
 
             kwargs = {
                 'entity_id': EntityId.PLAYER,
-                'hp': 5,
+                'hp': 15,
                 'can_hurt_monsters': True,
                 'name': "Player",
                 'blocking': True
@@ -150,7 +134,7 @@ class Game:
             color = colors.yellow
             name = "Nobody"
 
-            chance = random_percent(70)
+            chance = random_percent()
             if chance <= 30:
                 # orc
                 char = 'o'
@@ -178,7 +162,7 @@ class Game:
             logger.info("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
         else:
-            raise ValueError("Unknown spawn type: {}".format(name))
+            raise ValueError("Unknown spawn() type: {}".format(name))
 
     def draw(self):
         # map
