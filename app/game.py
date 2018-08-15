@@ -34,6 +34,25 @@ class InputMode(Enum):
     EDITOR = 1
 
 
+def move_towards(entity, other):
+    x, y = 0, 0
+    if entity.x < other.x:
+        x = 1
+    elif entity.x > other.x:
+        x = -1
+    else:
+        x = 0
+
+    if entity.y < other.y:
+        y = 1
+    elif entity.y > other.y:
+        y = -1
+    else:
+        y = 0
+
+    return x, y
+
+
 class Game:
     """
     note: see `init()`, definitions are not duplicated between it and `__init__()`
@@ -158,21 +177,6 @@ class Game:
 
             logger.info("Spawn('monster') = {}".format(str(spawn)))
             self.entities.append(spawn)
-        elif name == 'debug':
-            x = kwargs.get('x', 0)
-            y = kwargs.get('y', 0)
-            char = str(kwargs.get('char','X'))
-
-            kwargs = {
-                'entity_id': EntityId.DEBUG,
-                'can_hurt_monsters': False,
-                'name': char,
-                'blocking': False
-            }
-            spawn = Entity(x, y, char, colors.black, self, **kwargs)
-
-            logger.info("Spawn('debug') {}".format(str(spawn)))
-            self.entities.append(spawn)
         else:
             raise ValueError("Unknown spawn type: {}".format(name))
 
@@ -221,12 +225,13 @@ class Game:
 
     def update(self):
         if self.update_sim:
-            self.loop_ai()
+            self.update_ai()
             self.update_sim = False
-            print('. ')
+            if self.player.hp <= 0:
+                print("Player dies")
+                self.init()
 
         if self.fov_recompute:
-            # fov()
             self.fov_recompute = False
             self.visible_tiles = tdl.map.quickFOV(
                 self.player.x,
@@ -238,27 +243,36 @@ class Game:
             )
 
     def get_monsters_only(self):
-        # use map and filter based on Enum
-        e = self.entities[:]
-        e.remove(self.player)
-        return e
+        return self.get_entities(entity_id=EntityId.MONSTER)
 
-    def get_monsters_at(self, x, y):
-        monsters = []
+    def get_entities(self, entity_id=None):
+        if entity_id is None:
+            entity_id = EntityId.MONSTER
+
+        entities = []
+        for entity in self.entities:
+            if entity.entity_id == entity_id:
+                entities.append(entity)
+
+        return entities
+
+    def get_entities_at(self, x, y):
+        entities = []
+        # for monster in self.get_monsters_only():
+        for entity in self.entities:
+            if entity.x == x and entity.y == y:
+                entities.append(entity)
+
+        return entities
+
+    def update_ai(self):
+        for entity in self.get_entities(entity_id=None):
+            if entity.hp <= 0:
+                self.entities.remove(entity)
+                print("{} dies".format(entity.name))
+
         for monster in self.get_monsters_only():
-            if monster.x == x and monster.y == y:
-                monsters.append(monster)
-
-        return monsters
-
-    def loop_ai(self):
-        for monster in list(self.get_monsters_only()):
-            if monster.hp <= 0:
-                self.entities.remove(monster)
-                print("{} dies".format(monster.name))
-
-        for monster in self.get_monsters_only():
-            x, y = randint(-1, 1), randint(-1, 1)
+            x, y = move_towards(monster, self.player)
             monster.move_or_attack(x, y)
 
     def loop(self):
@@ -339,9 +353,8 @@ class Game:
                 logger.info("room padding: {}".format(self.map.room_gen_padding))
                 self.init()
 
-            # elif event.key == 'F1':
-            #     self.map.debug_show_colors = not self.map.debug_show_colors
-            #     self.init()
+            elif event.key == 'F1':
+                self.init()
             elif event.key == 'F2':
                 self.use_fog_of_war = not self.use_fog_of_war
                 print("Fog: {}".format(self.use_fog_of_war))
@@ -363,7 +376,7 @@ class Game:
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
                 self.fov_recompute = True
-                logger.info("Cell: {}".format(event.cell))
+                logger.info("LMB Cell: {}".format(event.cell))
 
         return {}
 

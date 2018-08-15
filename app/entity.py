@@ -40,26 +40,26 @@ class Entity:
     def move_or_attack(self, dx, dy):
         new_x = self.x + dx
         new_y = self.y + dy
-        logging.info("{} .move(dx={}, dy={})".format(self, dx, dy))
+        # logging.info("{} .move(dx={}, dy={})".format(self, dx, dy))
 
-        monsters = self.game.get_monsters_at(new_x, new_y)
+        entities = self.game.get_entities_at(new_x, new_y)
 
-        if not monsters:
+        if not entities:
             self.move(dx, dy)
             return
 
         # todo: allow/prohibit multiple attacks if they are stacked?
-        for monster in monsters:
-            if self == monster:
+        for entity in entities:
+            if self == entity:
                 continue
 
-            if not self.can_hurt_monsters:
+            if entity.entity_id == EntityId.MONSTER and not self.can_hurt_monsters:
                 continue
 
-            self.attack_entity(monster)
+            self.attack_entity(entity)
 
     def attack_entity(self, other):
-        print("{name} attacks {other} HP {hp} - {damage}".format(
+        print("{name} attacks {other}; {hp}HP - {damage} damage".format(
             name=self.name,
             other=other.name,
             hp=other.hp,

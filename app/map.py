@@ -163,11 +163,6 @@ class Map:
             if valid_room:
                 rooms.append(room)
                 room_id += 1
-                # name rooms using letters
-                self.game.spawn('debug', **{
-                    'char': 32+room_id,
-                    'x': room.x1,
-                    'y': room.y1})
 
         for room in rooms:
             if self.debug_show_colors:
