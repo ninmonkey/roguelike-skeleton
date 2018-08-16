@@ -35,7 +35,7 @@ class Entity:
     blocking -- is walking on this blocked?
     can_hurt_monsters -- enables monster friendly fire
     """
-    def __init__(self, x, y, char, color, game, entity_id, damage=1, hp=1, can_hurt_monsters=False, name=None, blocking=True):
+    def __init__(self, x, y, char, color, game, entity_id, damage=1, hp=1, can_hurt_monsters=False, name=None, blocking=True, ai=None):
         self.x = x
         self.y = y
         self.hp = hp
@@ -50,6 +50,7 @@ class Entity:
         self.name = name
         self.can_hurt_monsters = can_hurt_monsters
         self.entity_id = entity_id
+        self.path = []
 
     def move(self, dx, dy):
         if not self.map.is_blocked(self.x + dx, self.y + dy):

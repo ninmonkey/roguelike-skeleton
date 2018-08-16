@@ -252,6 +252,11 @@ class Map:
         else:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
+    def as_raw_list(self):
+        map = [[not self.at(x, y).blocking for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        # map = [[self.at(x, y).tile_id.value for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        return map
+
     def create_room(self, rect, tile_id=None, color=None):
         if tile_id is None:
             tile_id = TileId.FLOOR

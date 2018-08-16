@@ -4,14 +4,16 @@ from enum import Enum, unique
 from random import randint
 
 import tdl  # import tcod as libtcod
+import tcod.path
+import numpy as np
 
 from app import colors
+from app.map import Map, TileId
 from app.entity import (
+    move_towards,
     Entity,
     EntityId,
-    move_towards,
 )
-from app.map import Map, TileId
 from app.render import (
     render_blit,
     render_clear_all,
@@ -155,7 +157,7 @@ class Game:
                 'hp': hp,
                 'can_hurt_monsters': False,
                 'name': name,
-                'blocking': True
+                'blocking': True,
             }
             spawn = Entity(x, y, char, color, self, **kwargs)
 
@@ -242,7 +244,6 @@ class Game:
 
     def get_entities_at(self, x, y):
         entities = []
-        # for monster in self.get_monsters_only():
         for entity in self.entities:
             if entity.x == x and entity.y == y:
                 entities.append(entity)
@@ -250,14 +251,28 @@ class Game:
         return entities
 
     def update_ai(self):
+        # update deaths
         for entity in self.get_entities(entity_id=None):
             if entity.hp <= 0:
                 self.entities.remove(entity)
                 print("{} dies".format(entity.name))
 
         for monster in self.get_monsters_only():
-            x, y = move_towards(monster, self.player)
-            monster.move_or_attack(x, y)
+            if not monster.path:
+                # x, y = move_towards(monster, self.player)
+                # monster.move_or_attack(x, y)
+
+                # monster.path = []
+                print(self.map.as_raw_list())
+                map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
+                print(map_data)
+                astar = tcod.path.AStar(map_data)
+                monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
+                # print(monster.path)
+            else:
+                # print(monster.path)
+                next = monster.path.pop(0)
+                monster.teleport_to(*next)
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
@@ -267,7 +282,6 @@ class Game:
 
     def input(self):
         for event in tdl.event.get():
-            # event = tdl.event.key_wait()
             action = self.handle_input(event)
 
             if action:
