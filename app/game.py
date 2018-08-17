@@ -71,6 +71,7 @@ class Game:
         self.visible_tiles = [] # todo: move to map
         self.use_fog_of_war = True
         self.torch_radius = 10
+        self.draw_hp = True
 
         self.init()
         path = os.path.join(self.root_path, 'fonts', 'arial12x12.png')
@@ -196,11 +197,14 @@ class Game:
                 self.con.draw_char(x, y, None, fg=None, bg=color)
 
         # entities
-        render_entities(self.con, self.entities)
+        render_entities(self, self.con, self.entities)
 
         # this does draw player a 2nd time but then I don't have to worry about
         # entity order (to always be on top)
         render_entity(self.con, self.player)
+
+        # text
+        # self.con.draw_str(1, 0, 'asdf')
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
@@ -258,19 +262,22 @@ class Game:
                 print("{} dies".format(entity.name))
 
         for monster in self.get_monsters_only():
-            if not monster.path:
-                # x, y = move_towards(monster, self.player)
-                # monster.move_or_attack(x, y)
+            x, y = move_towards(monster, self.player)
+            monster.move_or_attack(x, y)
+            continue
 
+            if not monster.path:
                 # monster.path = []
-                print(self.map.as_raw_list())
+                # print(self.map.as_raw_list())
                 map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
-                print(map_data)
+                # print(map_data)
                 astar = tcod.path.AStar(map_data)
                 monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
                 # print(monster.path)
             else:
                 # print(monster.path)
+                # todo: only pop *if* move was successful
+                # raise NotImplementedError()
                 next = monster.path.pop(0)
                 monster.teleport_to(*next)
 
@@ -357,6 +364,8 @@ class Game:
                 self.use_fog_of_war = not self.use_fog_of_war
                 print("Fog: {}".format(self.use_fog_of_war))
                 self.init()
+            elif event.key == 'F3':
+                self.draw_hp = not self.draw_hp
             elif event.key == 'PAGEUP':
                 self.re_init_font()
             elif event.key == 'PAGEDOWN':

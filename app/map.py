@@ -28,6 +28,11 @@ class TileId(Enum):
     RANDOM = 999
 
 
+tile_weights = {
+    TileId.WALL: 100,
+    TileId.FLOOR: 1,
+}
+
 class Rect:
     def __init__(self, x, y, w, h):
         self.x1 = x
@@ -195,6 +200,9 @@ class Map:
                 self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_room[1])
 
         logger_map.info("Rooms used: {}".format(len(rooms)))
+        print("json it: ", self.tiles)
+        # print(self.at(0, 0).tile_id)
+        # print(tile_weights[self.at(0, 0).tile_id])
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -253,8 +261,9 @@ class Map:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
     def as_raw_list(self):
-        map = [[not self.at(x, y).blocking for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        map = [[tile_weights[self.at(x, y).tile_id] for y in range(self.tiles_y)] for x in range(self.tiles_x)]
         # map = [[self.at(x, y).tile_id.value for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+        # print(map)
         return map
 
     def create_room(self, rect, tile_id=None, color=None):
