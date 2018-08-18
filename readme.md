@@ -10,19 +10,14 @@ code mostly based on http://rogueliketutorials.com/libtcod/
  - **edit events** to be turn-based
     - pull loop_ai() outside recompute 
 
-# text
-    - render monster count
-    - render HP values of monsters
-# bugs:
-    - attack_or move currently doesn't iterate with player
-    in combat tests. specifically:
-        
-        def move_or_attack()
-            monsters = self.game.get_monsters_at(new_x, new_y)
-            
-        - if player has can_hurt_monsters=False
-            - it *does* prevent attacks
-            - but monster on monster still occurs 
+# next
+    text
+        - render monster count
+        - render HP values of monsters
+    - Allow Enum json ecoding:
+        https://stackoverflow.com/a/24482806
+    - use `to_json` and `from_json` on classes?
+    - json to auto save/write Enums type
 
 # todo:
 

@@ -70,7 +70,7 @@ class Game:
         self.fov_recompute = True
         self.update_sim = True
         self.visible_tiles = [] # todo: move to map
-        self.use_fog_of_war = True
+        self.use_fog_of_war = False
         self.torch_radius = 10
         self.draw_hp = False
 
@@ -344,14 +344,11 @@ class Game:
             # keys using char
             if event.key == 'CHAR':
                 if event.char == 'l' or event.char == 'z':
-                    from app.common import JSON_MAP
                     print("load_json")
                     self.map.load_json("map.json")
                 elif event.char == 's':
                     print("save_json")
                     self.map.save_json("map.json")
-                    # print('saving')
-                    raise NotImplementedError("json.save")
                 elif event.char == 'i':
                     raise NotImplementedError("Inventory does not exist yet")
                     return {'open': 'inventory'}

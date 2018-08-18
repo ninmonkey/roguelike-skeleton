@@ -89,15 +89,21 @@ class Tile:
 
         self.set_type(tile_id)
 
-    def as_json(self):
-        # todo: must be a better way to serialize
+    def from_json(self, json):
+        tile_id = TileId(json['tile_id'])
+        tile = Tile(tile_id)
+        tile['color'] = json['color']
+        return tile
+
+    def to_json(self):
         return {
-            'class': 'Tile',
+            # 'class': str(self.__class__),
+            'class': "Tile",
             'blocking': self.blocking,
             'blocks_vision': self.blocks_vision,
             'color': self.color,
             'explored': self.explored,
-            'tile_id': self.tile_id,
+            'tile_id': self.tile_id.value,
         }
 
     def set_type(self, tile_id):
@@ -147,15 +153,6 @@ class Map:
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
         self.tiles = [[Tile(tile_id) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-
-    def as_json(self):
-        raise NotImplementedError('need to serialize self.tiles')
-        return {
-            'class': 'Map',
-            'tiles_x': self.tiles_x,
-            'tiles_y': self.tiles_y,
-            'tiles': self.tiles,
-        }
 
     def gen_random_map(self):
         # entry point for dungeon generation
@@ -280,58 +277,43 @@ class Map:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
     def as_raw_list(self):
-        map = [[tile_weights[self.at(x, y).tile_id] for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-        # map = [[self.at(x, y).tile_id.value for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-        # print(map)
+        # get Map.tiles data
+        map = [[0 for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+
+        for x in range(self.tiles_x):
+            for y in range(self.tiles_y):
+                tile = self.at(x, y).to_json()
+                map[x][y] = tile
+
         return map
 
     def save_json(self, filename):
-        # todo: this has got to be easier
-
-
-        w, h = self.tiles_x, self.tiles_y
-
         json_data = {
-            'w': w,
-            'h': h,
-            'tiles': [[]]
+            'class': 'Map',
+            'w': self.tiles_x,
+            'h': self.tiles_y,
+            'tiles': self.as_raw_list(),
         }
 
-        json_data['tiles'] = [[tile_weights[self.at(x, y).tile_id] for y in range(self.tiles_y)] for x in range(self.tiles_x)]
-
-        from app.common import get_full_path
         path = os.path.join(self.game.root_path, 'maps', filename)
-        print("Save to: {}".format(path))
-        raise NotImplementedError()
+
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f)
 
     def load_json(self, filename):
-        # path = os.path.join(self.game.root_path, 'maps', filename)
-        from app.common import JSON_MAP
-        data = json.loads(JSON_MAP)
+        path = os.path.join(self.game.root_path, 'maps', filename)
 
-        # todo be actual headers in data?
-        w = len(data)
-        h = len(data[0])
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.loads(f.read())
 
+        w, h = data['w'], data['h']
         self.reset(w, h)
+
         for x in range(self.tiles_x):
             for y in range(self.tiles_y):
-                # self.tiles.at(x, y).tile_id = TileId.FLOOR
-                self.tiles[x][y].tile_id = data[x][y]
-
-                # self.tiles[x][y].tile_id = TileId.FLOOR
-
-        # todo: recalculate stuff like pathing
-
-
-        # print(data)
-        # print(len(data))
-        # print(len(data[0]))
-        # print(len(json))
-        # print(len(json[0]))
-        # from app.entity import EntityId
-        # print(self.game.player.as_json())
-        # print(self.game.player.as_json()['entity_id'] == EntityId.MONSTERzz)
+                tile_num = data['tiles'][x][y]['tile_id']
+                tile_type = TileId(tile_num)
+                self.at(x, y).set_type(tile_type)
 
     def create_room(self, rect, tile_id=None, color=None):
         if tile_id is None:
