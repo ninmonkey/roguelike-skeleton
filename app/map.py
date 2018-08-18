@@ -89,10 +89,16 @@ class Tile:
 
         self.set_type(tile_id)
 
-    def from_json(self, json):
-        tile_id = TileId(json['tile_id'])
+    @staticmethod
+    def from_json(data):
+        # todo: find a better way to serialize to/from 'automagically'
+        tile_id = TileId(data['tile_id'])  # Enum(int)
         tile = Tile(tile_id)
-        tile['color'] = json['color']
+
+        tile.blocking = data['blocking']
+        tile.blocks_vision = data['blocks_vision']
+        tile.color = data['color']
+        tile.explored = data['explored']
         return tile
 
     def to_json(self):
@@ -277,7 +283,7 @@ class Map:
             raise ValueError("Tile ({}, {}) outside of bounds: {}".format(x, y, self))
 
     def as_raw_list(self):
-        # get Map.tiles data
+        # get Map.tiles data (for serialization)
         map = [[0 for y in range(self.tiles_y)] for x in range(self.tiles_x)]
 
         for x in range(self.tiles_x):
@@ -309,11 +315,15 @@ class Map:
         w, h = data['w'], data['h']
         self.reset(w, h)
 
+        # tiles
         for x in range(self.tiles_x):
             for y in range(self.tiles_y):
-                tile_num = data['tiles'][x][y]['tile_id']
-                tile_type = TileId(tile_num)
-                self.at(x, y).set_type(tile_type)
+                tile = Tile.from_json(data['tiles'][x][y])
+                self.tiles[x][y] = tile
+
+        # player
+
+        # monsters/items
 
     def create_room(self, rect, tile_id=None, color=None):
         if tile_id is None:

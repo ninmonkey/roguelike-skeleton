@@ -31,6 +31,7 @@ code mostly based on http://rogueliketutorials.com/libtcod/
     
 - todo: disable input event auto-repeat
     - make key input based on state? 
+- # todo: find a better way to serialize to/from 'automagically'
 
 - separate screen_tiles_x from map_tiles_x for scrolling
 - text: player loc, monster count, fps.
