@@ -20,6 +20,7 @@ from app.render import (
     render_entities,
     render_entity,
     random_font_path,
+    render_text,
 )
 
 logger = logging.getLogger(__name__)
@@ -71,7 +72,7 @@ class Game:
         self.visible_tiles = [] # todo: move to map
         self.use_fog_of_war = True
         self.torch_radius = 10
-        self.draw_hp = True
+        self.draw_hp = False
 
         self.init()
         path = os.path.join(self.root_path, 'fonts', 'arial12x12.png')
@@ -203,8 +204,14 @@ class Game:
         # entity order (to always be on top)
         render_entity(self.con, self.player)
 
-        # text
-        # self.con.draw_str(1, 0, 'asdf')
+        # text and GUI
+        self.con.draw_str(0, self.map.tiles_y - 1, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
+            loc="({},{})".format(self.player.x, self.player.y),
+            hp=self.player.hp,
+            monster=len(self.get_monsters_only()),
+            total=len(self.entities)),
+            fg=colors.gray_80,
+            bg=colors.gray_20)
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)

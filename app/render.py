@@ -20,7 +20,11 @@ def render_entity(con, entity):
     con.draw_char(entity.x, entity.y, entity.char, bg=None, fg=entity.color)
 
 
-def render_label(con, game, text, entity):
+def render_text(x, y, con, text):
+    con.draw_str(x, y, text, fg=colors.gray_80, bg=colors.gray_20)
+
+
+def render_entity_label(con, game, text, entity):
     # con.draw_str(entity.x, entity.y + 1, text, fg=((128, 128, 128), 60))
     x, y = entity.x, entity.y + 1
     if not game.map.in_bounds(x, y):
@@ -33,7 +37,7 @@ def render_entities(game, con, entities):
     for entity in entities:
         render_entity(con, entity)
         if game.draw_hp:
-            render_label(con, game, str(entity.hp), entity)
+            render_entity_label(con, game, str(entity.hp), entity)
 
 
 def render_clear_all(con, fg=None, bg=None):
