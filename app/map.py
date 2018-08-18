@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 import time
 from enum import Enum, unique
@@ -81,11 +82,23 @@ class Tile:
     """
     def __init__(self, tile_id, blocking=False):
         self.blocking = blocking
-        self.color = colors.white
-        self.tile_id = TileId.FLOOR
-        self.explored = False
         self.blocks_vision = False
+        self.color = colors.white
+        self.explored = False
+        self.tile_id = TileId.FLOOR
+
         self.set_type(tile_id)
+
+    def as_json(self):
+        # todo: must be a better way to serialize
+        return {
+            'class': 'Tile',
+            'blocking': self.blocking,
+            'blocks_vision': self.blocks_vision,
+            'color': self.color,
+            'explored': self.explored,
+            'tile_id': self.tile_id,
+        }
 
     def set_type(self, tile_id):
         self.tile_id = tile_id
@@ -134,6 +147,15 @@ class Map:
         self.tiles_x = tiles_x
         self.tiles_y = tiles_y
         self.tiles = [[Tile(tile_id) for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+
+    def as_json(self):
+        raise NotImplementedError('need to serialize self.tiles')
+        return {
+            'class': 'Map',
+            'tiles_x': self.tiles_x,
+            'tiles_y': self.tiles_y,
+            'tiles': self.tiles,
+        }
 
     def gen_random_map(self):
         # entry point for dungeon generation
@@ -200,9 +222,6 @@ class Map:
                 self.create_tunnel_horizontal(pos_prev[0], pos_room[0], pos_room[1])
 
         logger_map.info("Rooms used: {}".format(len(rooms)))
-        print("json it: ", self.tiles)
-        # print(self.at(0, 0).tile_id)
-        # print(tile_weights[self.at(0, 0).tile_id])
 
     def gen_static_map(self):
         self.reset(self.tiles_x, self.tiles_y)
@@ -265,6 +284,54 @@ class Map:
         # map = [[self.at(x, y).tile_id.value for y in range(self.tiles_y)] for x in range(self.tiles_x)]
         # print(map)
         return map
+
+    def save_json(self, filename):
+        # todo: this has got to be easier
+
+
+        w, h = self.tiles_x, self.tiles_y
+
+        json_data = {
+            'w': w,
+            'h': h,
+            'tiles': [[]]
+        }
+
+        json_data['tiles'] = [[tile_weights[self.at(x, y).tile_id] for y in range(self.tiles_y)] for x in range(self.tiles_x)]
+
+        from app.common import get_full_path
+        path = os.path.join(self.game.root_path, 'maps', filename)
+        print("Save to: {}".format(path))
+        raise NotImplementedError()
+
+    def load_json(self, filename):
+        # path = os.path.join(self.game.root_path, 'maps', filename)
+        from app.common import JSON_MAP
+        data = json.loads(JSON_MAP)
+
+        # todo be actual headers in data?
+        w = len(data)
+        h = len(data[0])
+
+        self.reset(w, h)
+        for x in range(self.tiles_x):
+            for y in range(self.tiles_y):
+                # self.tiles.at(x, y).tile_id = TileId.FLOOR
+                self.tiles[x][y].tile_id = data[x][y]
+
+                # self.tiles[x][y].tile_id = TileId.FLOOR
+
+        # todo: recalculate stuff like pathing
+
+
+        # print(data)
+        # print(len(data))
+        # print(len(data[0]))
+        # print(len(json))
+        # print(len(json[0]))
+        # from app.entity import EntityId
+        # print(self.game.player.as_json())
+        # print(self.game.player.as_json()['entity_id'] == EntityId.MONSTERzz)
 
     def create_room(self, rect, tile_id=None, color=None):
         if tile_id is None:

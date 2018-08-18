@@ -184,6 +184,7 @@ class Game:
                 if visible and not explored:
                     self.map.at(x, y).explored = True
 
+                color = colors.white
                 if tile_id == TileId.WALL:
                     if visible:
                         color = colors.lit_dark_wall
@@ -205,13 +206,18 @@ class Game:
         render_entity(self.con, self.player)
 
         # text and GUI
-        self.con.draw_str(0, self.map.tiles_y - 1, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
-            loc="({},{})".format(self.player.x, self.player.y),
-            hp=self.player.hp,
-            monster=len(self.get_monsters_only()),
-            total=len(self.entities)),
-            fg=colors.gray_80,
-            bg=colors.gray_20)
+        # Todo: call render.draw_str which does bound checking
+        try:
+            self.con.draw_str(0, self.map.tiles_y - 1, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
+                loc="({},{})".format(self.player.x, self.player.y),
+                hp=self.player.hp,
+                monster=len(self.get_monsters_only()),
+                total=len(self.entities)),
+                fg=colors.gray_80,
+                bg=colors.gray_20)
+        except tdl.TDLError:
+            pass
+
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
@@ -324,13 +330,31 @@ class Game:
         UPDATE_SIM_KEYS = RECOMPUTE_LOS_KEYS
 
         if event.type == 'KEYDOWN':
-            # print(event)
+            # debug for key names
+                # print(event.key)
+                # print('%s event - char=%s key=%s alt=%i control=%i shift=%i' % (
+                # event.type.ljust(7), repr(event.char), repr(event.key), event.alt, event.control, event.shift))
 
             if event.key in RECOMPUTE_LOS_KEYS:
                 self.fov_recompute = True
 
             if event.key in UPDATE_SIM_KEYS:
                 self.update_sim = True
+
+            # keys using char
+            if event.key == 'CHAR':
+                if event.char == 'l' or event.char == 'z':
+                    from app.common import JSON_MAP
+                    print("load_json")
+                    self.map.load_json("map.json")
+                elif event.char == 's':
+                    print("save_json")
+                    self.map.save_json("map.json")
+                    # print('saving')
+                    raise NotImplementedError("json.save")
+                elif event.char == 'i':
+                    raise NotImplementedError("Inventory does not exist yet")
+                    return {'open': 'inventory'}
 
             # player
             if event.key == 'UP':
@@ -341,13 +365,8 @@ class Game:
                 return {'move': (-1, 0)}
             elif event.key == 'RIGHT':
                 return {'move': (1, 0)}
-            #elif event.key == 'TEXT':
-            elif event.key == 'CHAR':
-                raise NotImplementedError("Key of name 'i' isn't firing")
-                if event.key.text == 'i':
-                    return {'open': 'inventory'}
 
-            # debug / map / etc
+            # keys that do not use .char
             elif event.key == 'TAB':
                 if self.input_mode == InputMode.GAME:
                     self.input_mode = InputMode.EDITOR
@@ -377,7 +396,6 @@ class Game:
                 self.re_init_font()
             elif event.key == 'PAGEDOWN':
                 self.re_init_font()
-
             elif event.key == 'SPACE':
                 return {'rest': True}
             elif event.key == 'ESCAPE':

@@ -36,21 +36,33 @@ class Entity:
     can_hurt_monsters -- enables monster friendly fire
     """
     def __init__(self, x, y, char, color, game, entity_id, damage=1, hp=1, can_hurt_monsters=False, name=None, blocking=True, ai=None):
-        self.x = x
-        self.y = y
-        self.hp = hp
-        self.damage = damage
+        self.blocking = blocking
+        self.can_hurt_monsters = can_hurt_monsters
         self.char = char
         self.color = color
+        self.damage = damage
+        self.entity_id = entity_id
         self.game = game
+        self.hp = hp
         self.map = game.map
-        self.blocking = blocking
+        self.path = []
+        self.x = x
+        self.y = y
+
         if name is None:
             name = "Nobody"
         self.name = name
-        self.can_hurt_monsters = can_hurt_monsters
-        self.entity_id = entity_id
-        self.path = []
+
+    def as_json(self):
+        return {
+            'class': 'Entity',
+            'damage': self.damage,
+            'entity_id': self.entity_id,
+            'hp': self.hp,
+            'name': self.name,
+            'x': self.x,
+            'y': self.y,
+        }
 
     def move(self, dx, dy):
         if not self.map.is_blocked(self.x + dx, self.y + dy):
