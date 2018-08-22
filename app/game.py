@@ -67,7 +67,6 @@ class Game:
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.map.debug_show_colors = True
         self.input_mode = InputMode.GAME
-        self.debug_path = None
 
         self.fov_recompute = True
         self.update_sim = True
@@ -208,19 +207,16 @@ class Game:
         render_entity(self.con, self.player)
 
         # if DEBUG_VISUALS and self.debug_path:
-        # self.debug_path = [(self.player.x, self.player.y), (self.player.x +1, self.player.y), (self.player.x+1, self.player.y+1) ]
-
         if DEBUG_VISUALS:
-            if self.debug_path:
-                for x, y in self.debug_path:
-                    # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
-                    self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.red)
+            # if self.debug_path:
+            #     for x, y in self.debug_path:
+            #         self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.red)
 
             for monster in self.get_monsters_only():
                 if monster.path:
                     for x, y in monster.path:
-                        # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
-                        self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
+                        if self.map.in_bounds(x + 1, y + 1):
+                            self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
 
         # text and GUI
         # Todo: call render.draw_str which does bound checking
@@ -294,46 +290,37 @@ class Game:
             if not monster.path:
                 monster.path = self.astar_path(monster.x, monster.y, self.player.x, self.player.y)
 
-            print(monster.path)
-            print(monster.x, monster.y)
-            if monster.path:
-                next = monster.path[0]
-                # monster.move_towards(*next)
-                mod = (next[0] - monster.x, next[1] - monster.y)
-                monster.move_or_attack(*mod)
-
-
-                if next == (monster.x, monster.y):
-                    monster.path.pop(0)
-
-            # if monster.path:
-            #     print(monster.path)
-            #     for x, y in monster.path:
-            #         pass
-                    # next = monster.path[0]
-                    # print(next)
-                    # monster.move_or_attack(*next)
-                    # if (monster.x, monster.y) == monster.path[0]:
-                    #     monster.path.pop(0)
-                    # break
-
-
             if False:
+                print(monster.path)
+                print(monster.x, monster.y)
+                if monster.path:
+                    next = monster.path[0]
+                    # monster.move_towards(*next)
+                    mod = (next[0] - monster.x, next[1] - monster.y)
+                    monster.move_or_attack(*mod)
 
-                if not monster.path:
-                    # monster.path = []
-                    # print(self.map.as_raw_list())
-                    map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
-                    # print(map_data)
-                    astar = tcod.path.AStar(map_data)
-                    monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
-                    # print(monster.path)
-                else:
-                    # print(monster.path)
-                    # todo: only pop *if* move was successful
-                    # raise NotImplementedError()
-                    next = monster.path.pop(0)
-                    monster.teleport_to(*next)
+                    if next == (monster.x, monster.y):
+                        monster.path.pop(0)
+            else:
+                move = move_towards(monster, self.player)
+                monster.move_or_attack(*move)
+
+            # if False:
+                #
+                # if not monster.path:
+                #     # monster.path = []
+                #     # print(self.map.as_raw_list())
+                #     map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
+                #     # print(map_data)
+                #     astar = tcod.path.AStar(map_data)
+                #     monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
+                #     # print(monster.path)
+                # else:
+                #     # print(monster.path)
+                #     # todo: only pop *if* move was successful
+                #     # raise NotImplementedError()
+                #     next = monster.path.pop(0)
+                #     monster.teleport_to(*next)
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
@@ -450,10 +437,10 @@ class Game:
                 self.player.teleport_to(*event.cell)
                 self.fov_recompute = True
 
-                self.debug_path = self.astar_path(0, 0, self.player.x, self.player.y)
-                print("map: {}".format(self.debug_path))
-                for m in self.get_monsters_only():
-                    m.path = None
+                # self.debug_path = self.astar_path(0, 0, self.player.x, self.player.y)
+                # print("map: {}".format(self.debug_path))
+                # for m in self.get_monsters_only():
+                #     m.path = None
 
                 logger.info("LMB Cell: {}".format(event.cell))
 

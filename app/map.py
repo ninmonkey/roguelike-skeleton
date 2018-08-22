@@ -291,7 +291,6 @@ class Map:
                 tile = self.at(x, y).to_json()
                 map[x][y] = tile
 
-        print(map)
         return map
 
     def as_raw_list_cost(self):
@@ -304,7 +303,6 @@ class Map:
                 weight = tile_weights[tile_id]
                 map[x][y] = weight
 
-        print(map)
         return map
 
     def save_json(self, filename):
