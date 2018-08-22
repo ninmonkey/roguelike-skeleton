@@ -28,6 +28,7 @@ logger.setLevel(logging.DEBUG)
 
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
+DEBUG_VISUALS = True
 
 
 def random_percent():
@@ -66,6 +67,7 @@ class Game:
         self.map = Map(self.TILES_X, self.TILES_Y, self)
         self.map.debug_show_colors = True
         self.input_mode = InputMode.GAME
+        self.debug_path = None
 
         self.fov_recompute = True
         self.update_sim = True
@@ -205,6 +207,14 @@ class Game:
         # entity order (to always be on top)
         render_entity(self.con, self.player)
 
+        # if DEBUG_VISUALS and self.debug_path:
+        # self.debug_path = [(self.player.x, self.player.y), (self.player.x +1, self.player.y), (self.player.x+1, self.player.y+1) ]
+
+        if self.debug_path:
+            for x, y in self.debug_path:
+                # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
+                self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.red)
+
         # text and GUI
         # Todo: call render.draw_str which does bound checking
         try:
@@ -217,7 +227,6 @@ class Game:
                 bg=colors.gray_20)
         except tdl.TDLError:
             pass
-
 
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
@@ -277,22 +286,25 @@ class Game:
         for monster in self.get_monsters_only():
             x, y = move_towards(monster, self.player)
             monster.move_or_attack(x, y)
+
             continue
 
-            if not monster.path:
-                # monster.path = []
-                # print(self.map.as_raw_list())
-                map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
-                # print(map_data)
-                astar = tcod.path.AStar(map_data)
-                monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
-                # print(monster.path)
-            else:
-                # print(monster.path)
-                # todo: only pop *if* move was successful
-                # raise NotImplementedError()
-                next = monster.path.pop(0)
-                monster.teleport_to(*next)
+            if False:
+
+                if not monster.path:
+                    # monster.path = []
+                    # print(self.map.as_raw_list())
+                    map_data = np.array(self.map.as_raw_list(), dtype=np.int8)
+                    # print(map_data)
+                    astar = tcod.path.AStar(map_data)
+                    monster.path = astar.get_path(monster.x, monster.y, self.player.x, self.player.y)
+                    # print(monster.path)
+                else:
+                    # print(monster.path)
+                    # todo: only pop *if* move was successful
+                    # raise NotImplementedError()
+                    next = monster.path.pop(0)
+                    monster.teleport_to(*next)
 
     def loop(self):
         while not self.is_done and not tdl.event.is_window_closed():
@@ -405,9 +417,21 @@ class Game:
             if event.button == 'LEFT':
                 self.player.teleport_to(*event.cell)
                 self.fov_recompute = True
+
+                self.debug_path = self.astar_path(0, 0, self.player.x, self.player.y)
+                print("map: {}".format(self.debug_path))
+
                 logger.info("LMB Cell: {}".format(event.cell))
 
         return {}
+
+    def astar_path(self, x1, y1, x2, y2):
+        path = None
+
+        map_data = np.array(self.map.as_raw_list_cost(), dtype=np.int8)
+        astar = tcod.path.AStar(map_data)
+        path = astar.get_path(x1, y1, x2, y2)
+        return path
 
     def handle_input_editor(self, event):
         RECOMPUTE_LOS_KEYS = ["UP", "DOWN", "LEFT", "RIGHT"]

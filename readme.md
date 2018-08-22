@@ -14,10 +14,11 @@ code mostly based on http://rogueliketutorials.com/libtcod/
     text
         - render monster count
         - render HP values of monsters
-    - Allow Enum json ecoding:
+    
+    - autowrite Enum in json saves:
         https://stackoverflow.com/a/24482806
-    - use `to_json` and `from_json` on classes?
-    - json to auto save/write Enums type
+        https://hynek.me/articles/serialization/
+        
 
 # todo:
 
