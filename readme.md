@@ -14,6 +14,12 @@ code mostly based on http://rogueliketutorials.com/libtcod/
     text
         - render monster count
         - render HP values of monsters
+        
+    - pathfind
+        1. hardcode works, **monsters** don't.
+        2. walls are currently walkable even when value=999 ?
+            use walkable array
+        2. always use np arrays (or else cache)
     
     - autowrite Enum in json saves:
         https://stackoverflow.com/a/24482806

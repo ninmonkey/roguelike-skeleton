@@ -28,7 +28,7 @@ logger.setLevel(logging.DEBUG)
 
 FOV_ALGO = 'BASIC'
 FOV_LIGHT_WALL = True
-DEBUG_VISUALS = True
+DEBUG_VISUALS = False
 
 
 def random_percent():
@@ -210,10 +210,17 @@ class Game:
         # if DEBUG_VISUALS and self.debug_path:
         # self.debug_path = [(self.player.x, self.player.y), (self.player.x +1, self.player.y), (self.player.x+1, self.player.y+1) ]
 
-        if self.debug_path:
-            for x, y in self.debug_path:
-                # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
-                self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.red)
+        if DEBUG_VISUALS:
+            if self.debug_path:
+                for x, y in self.debug_path:
+                    # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
+                    self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.red)
+
+            for monster in self.get_monsters_only():
+                if monster.path:
+                    for x, y in monster.path:
+                        # self.con.draw_rect(x, y, 10, 10, bg=colors.red)
+                        self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
 
         # text and GUI
         # Todo: call render.draw_str which does bound checking
@@ -284,10 +291,32 @@ class Game:
                 print("{} dies".format(entity.name))
 
         for monster in self.get_monsters_only():
-            x, y = move_towards(monster, self.player)
-            monster.move_or_attack(x, y)
+            if not monster.path:
+                monster.path = self.astar_path(monster.x, monster.y, self.player.x, self.player.y)
 
-            continue
+            print(monster.path)
+            print(monster.x, monster.y)
+            if monster.path:
+                next = monster.path[0]
+                # monster.move_towards(*next)
+                mod = (next[0] - monster.x, next[1] - monster.y)
+                monster.move_or_attack(*mod)
+
+
+                if next == (monster.x, monster.y):
+                    monster.path.pop(0)
+
+            # if monster.path:
+            #     print(monster.path)
+            #     for x, y in monster.path:
+            #         pass
+                    # next = monster.path[0]
+                    # print(next)
+                    # monster.move_or_attack(*next)
+                    # if (monster.x, monster.y) == monster.path[0]:
+                    #     monster.path.pop(0)
+                    # break
+
 
             if False:
 
@@ -400,6 +429,9 @@ class Game:
                 print("Fog: {}".format(self.use_fog_of_war))
                 self.init()
             elif event.key == 'F3':
+                global DEBUG_VISUALS
+                DEBUG_VISUALS = not DEBUG_VISUALS
+            elif event.key == 'F4':
                 self.draw_hp = not self.draw_hp
             elif event.key == 'PAGEUP':
                 self.re_init_font()
@@ -420,12 +452,15 @@ class Game:
 
                 self.debug_path = self.astar_path(0, 0, self.player.x, self.player.y)
                 print("map: {}".format(self.debug_path))
+                for m in self.get_monsters_only():
+                    m.path = None
 
                 logger.info("LMB Cell: {}".format(event.cell))
 
         return {}
 
     def astar_path(self, x1, y1, x2, y2):
+        # todo: move to map
         path = None
 
         map_data = np.array(self.map.as_raw_list_cost(), dtype=np.int8)

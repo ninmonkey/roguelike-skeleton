@@ -30,7 +30,7 @@ class TileId(Enum):
 
 
 tile_weights = {
-    TileId.WALL: 100,
+    TileId.WALL: 9999,
     TileId.FLOOR: 1,
 }
 
