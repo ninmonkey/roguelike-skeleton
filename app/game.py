@@ -41,6 +41,9 @@ class InputMode(Enum):
     EDITOR = 1
 
 
+class Console:
+    pass
+
 class Game:
     """
     note: see `init()`, definitions are not duplicated between it and `__init__()`
@@ -80,6 +83,7 @@ class Game:
         tdl.set_font(path, greyscale=True, altLayout=True)
         self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
         self.con = tdl.Console(self.TILES_X, self.TILES_Y)
+        # self.con_console = tdl.Console(self.TILES_X, PANEL_HEIGHT)
         tdl.setFPS(self.limit_fps)
         logger.debug("FPS: {}".format(self.limit_fps))
 
@@ -113,13 +117,14 @@ class Game:
         if name == 'player':
             x = kwargs.get('x', 0)
             y = kwargs.get('y', 0)
+            hp = kwargs.get('hp', 15)
 
             kwargs = {
                 'entity_id': EntityId.PLAYER,
-                'hp': 15,
+                'hp': hp,
                 'can_hurt_monsters': True,
-                'name': "Player",
-                'blocking': True
+                'name': 'Player',
+                'blocking': True,
             }
             spawn = Entity(x, y, '@', colors.white, self, **kwargs)
 
@@ -218,10 +223,29 @@ class Game:
                         if self.map.in_bounds(x + 1, y + 1):
                             self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
 
-        # text and GUI
+        # HP bar GUI
+        # self.con.draw
+        # def _render_bar(x, y, total_width, name, val, max, bg_bar, bg_back):
+        #     bar_width = int(float(self.player.hp) / self.player.hp_max)
+        #     self.con_panel.draw_rect(x, y, total_width, 1, None, bg=bg_back)
+        #
+        #     self.con_panel.draw_rect(x, y, total_width, 1, None, bg=bg_back)
+        #     # now render the bar on top
+        #     if bar_width > 0:
+        #         self.con_panel.draw_rect(x, y, bar_width, 1, None, bg=bg_bar)
+        #
+        #     # todo: health numbers
+
+        # BAR_WIDTH = 20
+        # PANEL_HEIGHT = 7
+        # PANEL_Y = self.TILES_Y - PANEL_HEIGHT
+        # self.con_panel.clear(fg=colors.white, bg=colors.black)
+        # _render_bar(1, 1, BAR_WIDTH, 'hp', self.player.hp, self.player.hp_max, colors.light_red, colors.dark_red)
+
+        # TextGUI
         # Todo: call render.draw_str which does bound checking
         try:
-            self.con.draw_str(0, self.map.tiles_y - 1, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
+            self.con.draw_str(0, self.map.tiles_y - 2, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
                 loc="({},{})".format(self.player.x, self.player.y),
                 hp=self.player.hp,
                 monster=len(self.get_monsters_only()),
@@ -231,6 +255,7 @@ class Game:
         except tdl.TDLError:
             pass
 
+        # self.con.blit(self.con_panel, 0, PANEL_Y, self.TILES_X, PANEL_HEIGHT, 0, 0)
         # swap buffers
         render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
 
@@ -287,8 +312,8 @@ class Game:
                 print("{} dies".format(entity.name))
 
         for monster in self.get_monsters_only():
-            if not monster.path:
-                monster.path = self.astar_path(monster.x, monster.y, self.player.x, self.player.y)
+            # if not monster.path:
+            #     monster.path = self.astar_path(monster.x, monster.y, self.player.x, self.player.y)
 
             if False:
                 print(monster.path)

@@ -44,6 +44,7 @@ class Entity:
         self.entity_id = entity_id
         self.game = game
         self.hp = hp
+        self.hp_max = hp
         self.map = game.map
         self.path = []
         self.x = x
@@ -59,6 +60,7 @@ class Entity:
             'damage': self.damage,
             'entity_id': self.entity_id,
             'hp': self.hp,
+            'hp_max': self.hp_max,
             'name': self.name,
             'x': self.x,
             'y': self.y,
