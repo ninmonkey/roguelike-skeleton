@@ -21,16 +21,29 @@ def render_entity(con, entity):
 
 
 def render_text(x, y, con, text):
+    # see also: render_entity_label
     con.draw_str(x, y, text, fg=colors.gray_80, bg=colors.gray_20)
 
 
 def render_entity_label(con, game, text, entity):
-    # con.draw_str(entity.x, entity.y + 1, text, fg=((128, 128, 128), 60))
+    # see also: render_text
     x, y = entity.x, entity.y + 1
     if not game.map.in_bounds(x, y):
         return
 
     con.draw_str(x, y, text, fg=colors.white, bg=None)
+
+
+def render_bar(con, x, y, total_width, name, value, maximum, bar_color, bg_color):
+    # hp / mp bars
+    bar_width = int(float(value) / maximum * total_width)
+    con.draw_rect(x, y, total_width, 1, None, bg=bg_color)
+    if bar_width > 0:
+        con.draw_rect(x, y, bar_width, 1, None, bg=bar_color)
+
+
+
+
 
 
 def render_entities(game, con, entities):
@@ -54,4 +67,4 @@ def clear_entity(con, entity):
 
 def clear_all_entities(con, entities):
     for entity in entities:
-        clear_entity(entity)
+        clear_entity(con, entity)

@@ -15,6 +15,7 @@ from app.entity import (
     EntityId,
 )
 from app.render import (
+    render_bar,
     render_blit,
     render_clear_all,
     render_entities,
@@ -63,13 +64,18 @@ class Game:
         self.root_path = root_path
         self.limit_fps = 60
         self.is_done = False
-        self.TILES_X = 80
-        self.TILES_Y = 50
+        self.MAP_TILES_X = 80
+        self.MAP_TILES_Y = 50
+        self.SCREEN_TILES_X = self.MAP_TILES_X
+        self.SCREEN_TILES_Y = self.MAP_TILES_Y
         self.entities = []
         self.player = None
-        self.map = Map(self.TILES_X, self.TILES_Y, self)
+        self.map = Map(self.MAP_TILES_X, self.MAP_TILES_Y, self)
         self.map.debug_show_colors = True
         self.input_mode = InputMode.GAME
+        self.panel_height = 7
+        self.bar_width = 20
+        self.panel_y = self.SCREEN_TILES_Y - self.panel_height
 
         self.fov_recompute = True
         self.update_sim = True
@@ -81,9 +87,9 @@ class Game:
         self.init()
         path = os.path.join(self.root_path, 'fonts', 'arial12x12.png')
         tdl.set_font(path, greyscale=True, altLayout=True)
-        self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
-        self.con = tdl.Console(self.TILES_X, self.TILES_Y)
-        # self.con_console = tdl.Console(self.TILES_X, PANEL_HEIGHT)
+        self.root_console = tdl.init(self.SCREEN_TILES_X, self.SCREEN_TILES_Y, title='tcod demo', fullscreen=False)
+        self.con = tdl.Console(self.SCREEN_TILES_X, self.SCREEN_TILES_Y)
+        self.con_console = tdl.Console(self.SCREEN_TILES_X, self.panel_height)
         tdl.setFPS(self.limit_fps)
         logger.debug("FPS: {}".format(self.limit_fps))
 
@@ -92,8 +98,8 @@ class Game:
         path = random_font_path(PATH_APP_ROOT)
         logger.debug("font: ", path)
         tdl.set_font(path, greyscale=True, altLayout=True)
-        self.root_console = tdl.init(self.TILES_X, self.TILES_Y, title='tcod demo', fullscreen=False)
-        self.con = tdl.Console(self.TILES_X, self.TILES_Y)
+        self.root_console = tdl.init(self.SCREEN_TILES_X, self.SCREEN_TILES_Y, title='tcod demo', fullscreen=False)
+        self.con = tdl.Console(self.SCREEN_TILES_X, self.SCREEN_TILES_Y)
         tdl.setFPS(LIMIT_FPS)
 
     def init(self):
@@ -102,14 +108,19 @@ class Game:
         self.update_sim = True
         self.visible_tiles = []  # todo: move to map
         self.is_done = False
-        self.TILES_X = 80
-        self.TILES_Y = 50
+        self.MAP_TILES_X = 80
+        self.MAP_TILES_Y = 50
+        self.SCREEN_TILES_X = self.MAP_TILES_X
+        self.SCREEN_TILES_Y = self.MAP_TILES_Y
         self.entities = []
-        self.map.reset(self.TILES_X, self.TILES_Y)
+        self.map.reset(self.MAP_TILES_X, self.MAP_TILES_Y)
         self.player = self.spawn("player")
         self.input_mode = InputMode.GAME
         # self.use_fog_of_war = True
         self.torch_radius = 10
+        self.panel_height = 7
+        self.bar_width = 20
+        self.panel_y = self.SCREEN_TILES_Y - self.panel_height
 
         self.map.gen_random_map()
 
@@ -176,8 +187,8 @@ class Game:
 
     def draw(self):
         # map
-        for y in range(self.TILES_Y):
-            for x in range(self.TILES_X):
+        for y in range(self.SCREEN_TILES_Y):
+            for x in range(self.SCREEN_TILES_X):
                 # check for both fog of war, and tile visibility/LOS
 
                 tile_id = self.map.at(x, y).tile_id
@@ -224,6 +235,10 @@ class Game:
                             self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
 
         # HP bar GUI
+
+
+        # render_bar(self.con_console,
+
         # self.con.draw
         # def _render_bar(x, y, total_width, name, val, max, bg_bar, bg_back):
         #     bar_width = int(float(self.player.hp) / self.player.hp_max)
@@ -243,21 +258,21 @@ class Game:
         # _render_bar(1, 1, BAR_WIDTH, 'hp', self.player.hp, self.player.hp_max, colors.light_red, colors.dark_red)
 
         # TextGUI
-        # Todo: call render.draw_str which does bound checking
-        try:
-            self.con.draw_str(0, self.map.tiles_y - 2, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
-                loc="({},{})".format(self.player.x, self.player.y),
-                hp=self.player.hp,
-                monster=len(self.get_monsters_only()),
-                total=len(self.entities)),
-                fg=colors.gray_80,
-                bg=colors.gray_20)
-        except tdl.TDLError:
-            pass
+        # # Todo: call render.draw_str which does bound checking
+        # try:
+        #     self.con.draw_str(0, self.map.tiles_y - 2, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
+        #         loc="({},{})".format(self.player.x, self.player.y),
+        #         hp=self.player.hp,
+        #         monster=len(self.get_monsters_only()),
+        #         total=len(self.entities)),
+        #         fg=colors.gray_80,
+        #         bg=colors.gray_20)
+        # except tdl.TDLError:
+        #     pass
 
         # self.con.blit(self.con_panel, 0, PANEL_Y, self.TILES_X, PANEL_HEIGHT, 0, 0)
         # swap buffers
-        render_blit(self.root_console, self.con, self.TILES_X, self.TILES_Y)
+        render_blit(self.root_console, self.con, self.SCREEN_TILES_X, self.SCREEN_TILES_Y)
 
         # lazy, full clear.
         tdl.flush()
