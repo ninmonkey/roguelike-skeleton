@@ -41,9 +41,9 @@ def render_bar(con, x, y, total_width, name, value, maximum, bar_color, bg_color
     if bar_width > 0:
         con.draw_rect(x, y, bar_width, 1, None, bg=bar_color)
 
-
-
-
+    text = "{name}: {cur}/{max}".format(name=name, cur=value, max=maximum)
+    x_center = x + (total_width - len(text)) // 2
+    con.draw_str(x_center, y, text, fg=colors.white, bg=None)
 
 
 def render_entities(game, con, entities):

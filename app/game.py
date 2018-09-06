@@ -45,6 +45,7 @@ class InputMode(Enum):
 class Console:
     pass
 
+
 class Game:
     """
     note: see `init()`, definitions are not duplicated between it and `__init__()`
@@ -235,46 +236,12 @@ class Game:
                             self.con.draw_rect(x, y, width=1, height=1, string='.', bg=colors.green)
 
         # HP bar GUI
+        render_bar(self.con, 1, 1, self.bar_width, 'HP',
+                   self.player.hp, self.player.hp_max, colors.light_red, colors.dark_red)
 
-
-        # render_bar(self.con_console,
-
-        # self.con.draw
-        # def _render_bar(x, y, total_width, name, val, max, bg_bar, bg_back):
-        #     bar_width = int(float(self.player.hp) / self.player.hp_max)
-        #     self.con_panel.draw_rect(x, y, total_width, 1, None, bg=bg_back)
-        #
-        #     self.con_panel.draw_rect(x, y, total_width, 1, None, bg=bg_back)
-        #     # now render the bar on top
-        #     if bar_width > 0:
-        #         self.con_panel.draw_rect(x, y, bar_width, 1, None, bg=bg_bar)
-        #
-        #     # todo: health numbers
-
-        # BAR_WIDTH = 20
-        # PANEL_HEIGHT = 7
-        # PANEL_Y = self.TILES_Y - PANEL_HEIGHT
-        # self.con_panel.clear(fg=colors.white, bg=colors.black)
-        # _render_bar(1, 1, BAR_WIDTH, 'hp', self.player.hp, self.player.hp_max, colors.light_red, colors.dark_red)
-
-        # TextGUI
-        # # Todo: call render.draw_str which does bound checking
-        # try:
-        #     self.con.draw_str(0, self.map.tiles_y - 2, "Player HP: {hp}/15hp, loc={loc}  -- Ents: monster={monster}, total={total}".format(
-        #         loc="({},{})".format(self.player.x, self.player.y),
-        #         hp=self.player.hp,
-        #         monster=len(self.get_monsters_only()),
-        #         total=len(self.entities)),
-        #         fg=colors.gray_80,
-        #         bg=colors.gray_20)
-        # except tdl.TDLError:
-        #     pass
-
-        # self.con.blit(self.con_panel, 0, PANEL_Y, self.TILES_X, PANEL_HEIGHT, 0, 0)
-        # swap buffers
-        render_blit(self.root_console, self.con, self.SCREEN_TILES_X, self.SCREEN_TILES_Y)
-
+        # swap buffers.
         # lazy, full clear.
+        render_blit(self.root_console, self.con, self.SCREEN_TILES_X, self.SCREEN_TILES_Y)
         tdl.flush()
         render_clear_all(self.con, fg=colors.black, bg=colors.black)
 
